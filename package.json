@@ -1,0 +1,24 @@
+{
+  "private": true,
+  "name": "react-hook-template",
+  "workspaces": [
+    "packages/*"
+  ],
+  "devDependencies": {
+    "prettier": "^2.0.5"
+  },
+  "prettier": {
+    "printWidth": 80,
+    "semi": false,
+    "singleQuote": true,
+    "trailingComma": "es5"
+  },
+  "husky": {
+    "pre-commit": "echo commiting"
+  },
+  "scripts": {
+    "dev": "yarn workspace example dev",
+    "build": "yarn workspace react-hook build",
+    "publish": "yarn workspace react-hook npm publish"
+  }
+}
