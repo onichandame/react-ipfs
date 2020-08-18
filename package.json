@@ -18,7 +18,7 @@
   },
   "scripts": {
     "dev": "yarn workspace example dev",
-    "build": "yarn workspace react-hook build",
-    "publish": "yarn workspace react-hook npm publish"
+    "build": "yarn workspace react-ipfs-hook build",
+    "publish": "yarn workspace react-ipfs-hook npm publish"
   }
 }

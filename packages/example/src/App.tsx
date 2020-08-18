@@ -1,10 +1,10 @@
 import React from 'react'
 import logo from './logo.svg'
 import './App.css'
-import { useCount } from 'react-hook'
+import { useIpfs } from 'react-ipfs-hook'
 
 function App() {
-  const { val } = useCount()
+  const { ipfs, isIpfsReady, ipfsInitError } = useIpfs()
   return (
     <div className="App">
       <header className="App-header">
@@ -20,7 +20,7 @@ function App() {
         >
           Learn React
         </a>
-        <h3>{val}</h3>
+        <h3>{isIpfsReady ? ipfs : `loading`}</h3>
       </header>
     </div>
   )
