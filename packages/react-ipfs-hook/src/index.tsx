@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Ipfs, create } from 'ipfs'
+import Ipfs from 'ipfs'
 
 let ipfs: Ipfs | null
 let lock: Promise<any> | null = null
@@ -18,7 +18,7 @@ export const useIpfs = () => {
       } else {
         try {
           console.time('IPFS Started')
-          ipfs = await create()
+          ipfs = await Ipfs.create()
           console.timeEnd('IPFS Started')
         } catch (error) {
           console.error('IPFS init error:', error)

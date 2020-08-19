@@ -1,10 +1,14 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import logo from './logo.svg'
 import './App.css'
 import { useIpfs } from 'react-ipfs-hook'
 
 function App() {
   const { ipfs, isIpfsReady, ipfsInitError } = useIpfs()
+  const [id, setId] = useState<string>(``)
+  useEffect(() => {
+    ipfs?.id().then(id => setId(id.id))
+  })
   return (
     <div className="App">
       <header className="App-header">
@@ -20,7 +24,7 @@ function App() {
         >
           Learn React
         </a>
-        <h3>{isIpfsReady ? ipfs : `loading`}</h3>
+        <h3>{ipfsInitError ? `error` : isIpfsReady ? id : `loading`}</h3>
       </header>
     </div>
   )
