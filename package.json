@@ -5,6 +5,8 @@
     "packages/*"
   ],
   "devDependencies": {
+    "husky": "^4.2.5",
+    "nodemon": "^2.0.4",
     "prettier": "^2.0.5"
   },
   "prettier": {
@@ -14,11 +16,15 @@
     "trailingComma": "es5"
   },
   "husky": {
-    "pre-commit": "echo commiting"
+    "hooks": {
+      "pre-commit": "echo commiting"
+    }
   },
   "scripts": {
-    "dev": "yarn workspace example dev",
-    "build": "yarn workspace react-ipfs-hook build",
+    "dev": "nodemon",
+    "build": "yarn build:hook && yarn build:example",
+    "build:hook": "yarn workspace react-ipfs-hook run build",
+    "build:example": "yarn workspace example run build",
     "publish": "yarn workspace react-ipfs-hook publish"
   }
 }

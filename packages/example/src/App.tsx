@@ -7,8 +7,8 @@ function App() {
   const { ipfs, isIpfsReady, ipfsInitError } = useIpfs()
   const [id, setId] = useState<string>(``)
   useEffect(() => {
-    ipfs?.id().then(id => setId(id.id))
-  })
+    ipfs?.id().then((id) => setId(id.id))
+  }, [ipfs])
   return (
     <div className="App">
       <header className="App-header">
