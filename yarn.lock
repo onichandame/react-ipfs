@@ -4010,7 +4010,7 @@ cid-tool@^0.4.0:
     split2 "^3.1.1"
     yargs "^15.0.2"
 
-cids@*, cids@^0.8.0, cids@^0.8.3, cids@^1.0.0, cids@~0.8.0, cids@~0.8.1, cids@~0.8.3:
+cids@*, cids@^0.8.0, cids@^0.8.3, cids@~0.8.0, cids@~0.8.1, cids@~0.8.3:
   version "0.8.3"
   resolved "https://registry.npm.taobao.org/cids/download/cids-0.8.3.tgz#aaf48ac8ed857c3d37dad94d8db1d8c9407b92db"
   integrity sha1-qvSKyO2FfD032tlNjbHYyUB7kts=
@@ -4020,6 +4020,17 @@ cids@*, cids@^0.8.0, cids@^0.8.3, cids@^1.0.0, cids@~0.8.0, cids@~0.8.1, cids@~0
     multibase "^1.0.0"
     multicodec "^1.0.1"
     multihashes "^1.0.1"
+
+cids@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.npm.taobao.org/cids/download/cids-1.0.0.tgz#5a148c4adbf3c56c45bbcf9000451907dfe8b5b2"
+  integrity sha1-WhSMStvzxWxFu8+QAEUZB9/otbI=
+  dependencies:
+    class-is "^1.1.0"
+    multibase "^3.0.0"
+    multicodec "^2.0.0"
+    multihashes "^3.0.1"
+    uint8arrays "^1.0.0"
 
 cipher-base@^1.0.0, cipher-base@^1.0.1, cipher-base@^1.0.3:
   version "1.0.4"
@@ -10682,15 +10693,6 @@ multibase@^1.0.0, multibase@^1.0.1:
     base-x "^3.0.8"
     buffer "^5.5.0"
 
-multibase@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.npm.taobao.org/multibase/download/multibase-2.0.0.tgz#e20a2a14813fa435dc69c702909209ac0741919e"
-  integrity sha1-4goqFIE/pDXcaccCkJIJrAdBkZ4=
-  dependencies:
-    base-x "^3.0.8"
-    buffer "^5.5.0"
-    web-encoding "^1.0.2"
-
 multibase@^3.0.0:
   version "3.0.0"
   resolved "https://registry.npm.taobao.org/multibase/download/multibase-3.0.0.tgz#f56eb828ee5c00241fe860ed5e2d144c8b9821f4"
@@ -10745,16 +10747,6 @@ multihashes@^1.0.1:
     multibase "^1.0.1"
     varint "^5.0.0"
 
-multihashes@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.npm.taobao.org/multihashes/download/multihashes-2.0.0.tgz#4fa599d2d726ec6de33bf1e6f6d9f04b2351ace9"
-  integrity sha1-T6WZ0tcm7G3jO/Hm9tnwSyNRrOk=
-  dependencies:
-    buffer "^5.6.0"
-    multibase "^2.0.0"
-    varint "^5.0.0"
-    web-encoding "^1.0.2"
-
 multihashes@^3.0.1:
   version "3.0.1"
   resolved "https://registry.npm.taobao.org/multihashes/download/multihashes-3.0.1.tgz#607c243d5e04ec022ac76c9c114e08416216f019"
@@ -10798,14 +10790,14 @@ multihashing-async@^1.0.0:
     murmurhash3js-revisited "^3.0.0"
 
 multihashing-async@^2.0.1:
-  version "2.0.0"
-  resolved "https://registry.npm.taobao.org/multihashing-async/download/multihashing-async-2.0.0.tgz#77b671d1528ed78f7f1c4fd8322dd284497aedee"
-  integrity sha1-d7Zx0VKO149/HE/YMi3ShEl67e4=
+  version "2.0.1"
+  resolved "https://registry.npm.taobao.org/multihashing-async/download/multihashing-async-2.0.1.tgz#cc50e05e88b02ed0a2d8a9518d8a6cf1fcf12aa1"
+  integrity sha1-zFDgXoiwLtCi2KlRjYps8fzxKqE=
   dependencies:
     blakejs "^1.1.0"
     err-code "^2.0.0"
     js-sha3 "^0.8.0"
-    multihashes "^2.0.0"
+    multihashes "^3.0.1"
     murmurhash3js-revisited "^3.0.0"
     uint8arrays "^1.0.0"
 

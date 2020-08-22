@@ -4,10 +4,12 @@ import './App.css'
 import { useIpfs } from 'react-ipfs-hook'
 
 function App() {
-  const { ipfs, isIpfsReady, ipfsInitError } = useIpfs()
+  const [ipfs, error] = useIpfs()
   const [id, setId] = useState<string>(``)
   useEffect(() => {
-    ipfs?.id().then((id) => setId(id.id))
+    if (ipfs) {
+      ipfs?.id().then((id) => setId(id.id))
+    }
   }, [ipfs])
   return (
     <div className="App">
@@ -24,7 +26,7 @@ function App() {
         >
           Learn React
         </a>
-        <h3>{ipfsInitError ? `error` : isIpfsReady ? id : `loading`}</h3>
+        <h3>{error ? `error` : ipfs ? id : `loading`}</h3>
       </header>
     </div>
   )

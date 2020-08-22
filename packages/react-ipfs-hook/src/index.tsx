@@ -1,13 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useState, useEffect } from 'react'
 import Ipfs from 'ipfs'
 
-let ipfs: Ipfs | null
-let lock: Promise<any> | null = null
+export const useIpfs = (): [Ipfs | null, Error | null] => {
+  const [ipfs, setIpfs] = useState<Ipfs | null>(null)
+  const [error, setError] = useState<Error | null>(null)
 
-export const useIpfs = () => {
-  const [isIpfsReady, setIpfsReady] = useState<boolean>(Boolean(ipfs))
-  const [ipfsInitError, setIpfsInitError] = useState<Error | null>(null)
-
+  let lock: Promise<any>
   useEffect(() => {
     // The fn to useEffect should not return anything other than a cleanup fn,
     // So it cannot be marked async, which causes it to return a promise,
@@ -18,28 +16,27 @@ export const useIpfs = () => {
       } else {
         try {
           console.time('IPFS Started')
-          ipfs = await Ipfs.create()
+          setIpfs(await Ipfs.create())
           console.timeEnd('IPFS Started')
-        } catch (error) {
-          console.error('IPFS init error:', error)
-          ipfs = null
-          setIpfsInitError(error)
+          setError(null)
+        } catch (e) {
+          console.error('IPFS init error:', e)
+          setIpfs(null)
+          setError(e)
         }
       }
-
-      setIpfsReady(Boolean(ipfs))
     }
 
     if (!lock) lock = startIpfs()
     return function cleanup() {
       if (ipfs && ipfs.stop) {
         console.log('Stopping IPFS')
-        ipfs.stop().catch(err => console.error(err))
-        ipfs = null
-        setIpfsReady(false)
+        ipfs.stop().catch((err) => console.error(err))
+        setIpfs(null)
+        setError(null)
       }
     }
   }, [])
 
-  return { ipfs, isIpfsReady, ipfsInitError }
+  return [ipfs, error]
 }
