@@ -26,5 +26,6 @@
     "build:hook": "yarn workspace react-ipfs-hook run build",
     "build:example": "yarn workspace example run build",
     "publish": "yarn workspace react-ipfs-hook publish"
-  }
+  },
+  "version": "0.0.0"
 }
