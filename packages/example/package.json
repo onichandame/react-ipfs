@@ -24,6 +24,11 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
+  "prettier": {
+    "singleQuote": true,
+    "semi": false,
+    "arrowParens": "avoid"
+  },
   "eslintConfig": {
     "extends": "react-app"
   },
