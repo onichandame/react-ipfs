@@ -29,8 +29,8 @@ export const Fs: FC = () => {
   const listFiles = useCallback(async () => {
     if (ipfs && addr) {
       let result = ``
-      for await (const file of ipfs.get(addr)) {
-        result = file.path
+      for await (const file of ipfs.cat(addr)) {
+        result = file.toString()
         break
       }
       alert(result)
