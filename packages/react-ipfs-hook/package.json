@@ -36,6 +36,7 @@
   "module": "dist/react-ipfs-hook.esm.js",
   "devDependencies": {
     "@types/ipfs": "https://github.com/Xmader/ipfs-types",
+    "@types/ipfs-http-client": "https://github.com/onichandame/ipfs-http-types.git",
     "@types/react": "^16.9.46",
     "@types/react-dom": "^16.9.8",
     "husky": "^4.2.5",

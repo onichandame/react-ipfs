@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import {} from 'ipfs-http-client'
 import Ipfs from 'ipfs'
 
 export const useIpfs = (): [Ipfs | null, Error | null] => {
@@ -31,7 +32,7 @@ export const useIpfs = (): [Ipfs | null, Error | null] => {
     return function cleanup() {
       if (ipfs && ipfs.stop) {
         console.log('Stopping IPFS')
-        ipfs.stop().catch((err) => console.error(err))
+        ipfs.stop().catch(err => console.error(err))
         setIpfs(null)
         setError(null)
       }

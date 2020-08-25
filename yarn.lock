@@ -2058,6 +2058,18 @@
   dependencies:
     "@types/node" "*"
 
+"@types/ipfs-http-client@https://github.com/onichandame/ipfs-http-types.git":
+  version "46.0.1"
+  resolved "https://github.com/onichandame/ipfs-http-types.git#756c67e8bbec739c7e0dcb9bbeb93514429ff0d0"
+  dependencies:
+    "@types/bl" "*"
+    "@types/ipfs-repo" "git+https://github.com/232c/ipfs-repo-types.git"
+    "@types/multiaddr" "*"
+    "@types/node" "*"
+    bignumber.js "*"
+    cids "*"
+    peer-id "*"
+
 "@types/ipfs-repo@git+https://github.com/232c/ipfs-repo-types.git":
   version "1.0.0"
   resolved "git+https://github.com/232c/ipfs-repo-types.git#a2e429936706629398abdad82eb5ab1c2e1b159c"
