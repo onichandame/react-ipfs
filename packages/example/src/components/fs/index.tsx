@@ -28,13 +28,18 @@ export const Fs: FC = () => {
   }, [ipfs, error, updateFiles])
   const listFiles = useCallback(async () => {
     if (ipfs && addr) {
-      let result = ``
-      for await (const file of ipfs.cat(addr)) {
-        result = file.toString()
-        break
+      try {
+        let result = ``
+        for await (const file of ipfs.cat(addr)) {
+          result = file.toString()
+          break
+        }
+        alert(result)
+        setName(result)
+      } catch (e) {
+        alert(e.message)
+        setName(e.message)
       }
-      alert(result)
-      setName(result)
     }
   }, [ipfs, addr])
   return (
@@ -67,7 +72,7 @@ export const Fs: FC = () => {
         }}
       >
         <input type="text" onChange={e => setAddr(e.currentTarget.value)} />
-        <button>get file name</button>
+        <button>get file content</button>
       </form>
       <div>{name}</div>
     </>
