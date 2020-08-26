@@ -1,1 +1,2 @@
-export * from './fs'
+export * from './embedded'
+export * from './external'
