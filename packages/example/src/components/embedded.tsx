@@ -7,7 +7,7 @@ import { Panel } from './panel'
 export const Embedded: FC = () => {
   const [ipfs, ipfsErr] = useIpfs()
   return (
-    <Grid container spacing={2} direction={'column'}>
+    <Grid container spacing={2} direction={'column'} alignItems="center">
       <Grid item>
         <Typography variant="h5">Embedded IPFS Node:</Typography>
       </Grid>

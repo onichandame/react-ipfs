@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import Ipfs from 'ipfs'
 
-export const useIpfs = (): [Ipfs | null, Error | null] => {
+export const useIpfsEmbedded = (): [Ipfs | null, Error | null] => {
   const [ipfs, setIpfs] = useState<Ipfs | null>(null)
   const [error, setError] = useState<Error | null>(null)
 

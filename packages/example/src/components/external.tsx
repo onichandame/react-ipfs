@@ -1,14 +1,14 @@
 import React, { FC, useState } from 'react'
 import { Grid, Typography, TextField } from '@material-ui/core'
-import { useIpfsHttpClient } from 'react-ipfs-hook'
+import { useIpfs } from 'react-ipfs-hook'
 
 import { Panel } from './panel'
 
 export const External: FC = () => {
-  const [addr, setAddr] = useState<string>(``)
-  const [ipfs, ipfsErr] = useIpfsHttpClient(addr)
+  const [addr, setAddr] = useState<string>(`http://localhost:5001`)
+  const [ipfs, ipfsErr] = useIpfs({ external: true, opts: addr })
   return (
-    <Grid container spacing={2} direction={'column'}>
+    <Grid container spacing={2} direction={'column'} alignItems="center">
       <Grid item>
         <Grid container direction="row">
           <Grid item>
