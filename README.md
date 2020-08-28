@@ -8,6 +8,8 @@ react hook for ipfs
 
 # Usage
 
+For live example check <https://onichandame.com/react-ipfs-hook/>
+
 For detailed usage see [the exampl](./packages/example).
 
 ```typescriptreact
