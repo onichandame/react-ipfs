@@ -1,5 +1,5 @@
 import React, { FC, useCallback, useState, useEffect } from 'react'
-import {} from 'uuid'
+import { v1 as uuid } from 'uuid'
 import Ipfs from 'ipfs'
 import IpfsHttpClient from 'ipfs-http-client'
 import {
@@ -11,7 +11,7 @@ import {
   TableBody,
   TableRow,
   TableCell,
-  TextField
+  TextField,
 } from '@material-ui/core'
 
 type Props = {
@@ -19,6 +19,7 @@ type Props = {
 }
 
 export const Panel: FC<Props> = ({ ipfs }) => {
+  const fieldId = `file-${uuid()}`
   const [id, setId] = useState<string>(``)
   const [addr, setAddr] = useState<string>(``)
   const [peers, setPeers] = useState<number>(0)
@@ -95,7 +96,7 @@ export const Panel: FC<Props> = ({ ipfs }) => {
               }}
             >
               <input
-                id="file-selector"
+                id={fieldId}
                 style={{ display: 'none' }}
                 type="file"
                 onChange={e => {
@@ -104,7 +105,7 @@ export const Panel: FC<Props> = ({ ipfs }) => {
                     setFile(e.currentTarget.files[0])
                 }}
               />
-              <label htmlFor="file-selector">
+              <label htmlFor={fieldId}>
                 <Button variant="text" component="span">
                   {file?.name || `choose a file`}
                 </Button>
