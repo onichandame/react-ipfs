@@ -12,7 +12,11 @@ export const External: FC = () => {
       <Grid item>
         <Grid container direction="row">
           <Grid item>
-            <Typography variant="h5">External IPFS Node:</Typography>
+            <Typography variant="h5">
+              <a href="https://onichandame.com/post/ipfs">
+                External IPFS Node:
+              </a>
+            </Typography>
           </Grid>
           <Grid item>
             <TextField

@@ -43,3 +43,5 @@ const Component: FC = () => {
   )
 }
 ```
+
+Note: running an external IPFS daemon is recommended as the in-browser solution is still very limited and almost unusable. Check [my guide](https://onichandame.com/post/ipfs) for details.
