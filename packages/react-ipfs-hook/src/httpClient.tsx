@@ -6,8 +6,8 @@ export const useIpfsHttpClient = (
 ): [Ipfs | null, Error | null] => {
   const [ipfs, setIpfs] = useState<Ipfs | null>(null)
   const [error, setError] = useState<Error | null>(null)
+  const [lock, setLock] = useState<Promise<any> | null>(null)
 
-  let lock: Promise<any> | null = null
   useEffect(() => {
     // The fn to useEffect should not return anything other than a cleanup fn,
     // So it cannot be marked async, which causes it to return a promise,
@@ -34,9 +34,9 @@ export const useIpfsHttpClient = (
       }
     }
 
-    if (!lock) lock = startIpfs()
+    if (!lock) setLock(startIpfs())
     return () => {
-      lock = null
+      setLock(null)
     }
   }, opts)
 
