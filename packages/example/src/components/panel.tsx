@@ -3,6 +3,8 @@ import { v1 as uuid } from 'uuid'
 import Ipfs from 'ipfs'
 import IpfsHttpClient from 'ipfs-http-client'
 import {
+  Dialog,
+  DialogContent,
   Paper,
   Button,
   Grid,
@@ -11,8 +13,9 @@ import {
   TableBody,
   TableRow,
   TableCell,
-  TextField,
 } from '@material-ui/core'
+
+import { Input } from './common'
 
 type Props = {
   ipfs: Ipfs | IpfsHttpClient | null
@@ -21,11 +24,11 @@ type Props = {
 export const Panel: FC<Props> = ({ ipfs }) => {
   const fieldId = `file-${uuid()}`
   const [id, setId] = useState<string>(``)
-  const [addr, setAddr] = useState<string>(``)
   const [peers, setPeers] = useState<number>(0)
   const [files, setFiles] = useState<{ name: string; cid: string }[]>([])
-  const [name, setName] = useState<string>(``)
+  const [content, setContent] = useState<string>(``)
   const [file, setFile] = useState<File | null>(null)
+  const [open, setOpen] = useState<boolean>(false)
   const updateFiles = useCallback(async () => {
     if (ipfs) {
       const result = []
@@ -43,95 +46,145 @@ export const Panel: FC<Props> = ({ ipfs }) => {
       updateFiles()
     }
   }, [ipfs, updateFiles])
-  const listFiles = useCallback(async () => {
-    if (ipfs && addr) {
-      try {
-        let result = ``
-        for await (const file of ipfs.cat(addr)) {
-          result = file.toString()
-          break
+  const readFile = useCallback(
+    async (addr: string) => {
+      if (ipfs && addr) {
+        try {
+          let result = ``
+          for await (const file of ipfs.cat(addr)) {
+            result = file.toString()
+            break // Read only one file
+          }
+          setContent(result)
+        } catch (e) {
+          setContent(e.message)
         }
-        alert(result)
-        setName(result)
-      } catch (e) {
-        alert(e.message)
-        setName(e.message)
+        setOpen(true)
       }
-    }
-  }, [ipfs, addr])
+    },
+    [ipfs]
+  )
   return (
-    <Grid container direction="column">
-      <Grid item>
-        <TableContainer component={Paper}>
-          <Table size="small" aria-label="node info">
-            <TableBody>
-              <TableRow>
-                <TableCell component="th" scope="row">
-                  ID
-                </TableCell>
-                <TableCell>{id}</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell component="th" scope="row">
-                  Peers
-                </TableCell>
-                <TableCell>{peers}</TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Grid>
-      <Grid item>
-        <Grid container direction="column">
-          <Grid item>
-            <form
-              noValidate
-              autoComplete="off"
-              onSubmit={event => {
-                event.preventDefault()
-                if (ipfs && file)
-                  ipfs.files
-                    .write(`/${file.name}`, file, { create: true })
-                    .then(updateFiles)
-              }}
-            >
-              <input
-                id={fieldId}
-                style={{ display: 'none' }}
-                type="file"
-                onChange={e => {
-                  e.preventDefault()
-                  if (e.currentTarget.files && e.currentTarget.files.length)
-                    setFile(e.currentTarget.files[0])
-                }}
-              />
-              <label htmlFor={fieldId}>
-                <Button variant="text" component="span">
-                  {file?.name || `choose a file`}
-                </Button>
-              </label>
-              <Button type="submit" variant="contained">
-                submit
-              </Button>
-            </form>
-          </Grid>
-          <Grid item>{JSON.stringify(files)}</Grid>
-          <Grid item>
-            <form
-              onSubmit={e => {
-                e.preventDefault()
-                if (ipfs && addr) listFiles()
-              }}
-            >
-              <TextField onChange={e => setAddr(e.currentTarget.value)} />
-              <Button type="submit">Get File Content</Button>
-            </form>
-          </Grid>
-          <Grid item>
-            <div>{name}</div>
-          </Grid>
+    <>
+      <Grid container direction="column">
+        <Grid item>
+          <TableContainer component={Paper}>
+            <Table size="small" aria-label="node info">
+              <TableBody>
+                <TableRow>
+                  <TableCell component="th" scope="row">
+                    ID
+                  </TableCell>
+                  <TableCell>{id}</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell component="th" scope="row">
+                    Peers
+                  </TableCell>
+                  <TableCell>{peers}</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell component="th" scope="row">
+                    Publish
+                  </TableCell>
+                  <TableCell>
+                    <form
+                      noValidate
+                      autoComplete="off"
+                      onSubmit={event => {
+                        event.preventDefault()
+                        if (ipfs && file)
+                          ipfs.files
+                            .write(`/${file.name}`, file, { create: true })
+                            .then(updateFiles)
+                      }}
+                    >
+                      <input
+                        id={fieldId}
+                        style={{ display: 'none' }}
+                        type="file"
+                        onChange={e => {
+                          e.preventDefault()
+                          if (
+                            e.currentTarget.files &&
+                            e.currentTarget.files.length
+                          )
+                            setFile(e.currentTarget.files[0])
+                        }}
+                      />
+                      <label htmlFor={fieldId}>
+                        <Button variant="text" component="span">
+                          {file?.name || `choose a file`}
+                        </Button>
+                      </label>
+                      <Button type="submit" variant="contained">
+                        submit
+                      </Button>
+                    </form>
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell component="th" scope="row">
+                    Read
+                  </TableCell>
+                  <TableCell>
+                    <Input onSubmit={val => readFile(val[0])} />
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell component="th" scope="row">
+                    Subscribe
+                  </TableCell>
+                  <TableCell>
+                    <Input
+                      submit="subscribe"
+                      onSubmit={val => {
+                        ipfs?.pubsub.subscribe(val, (msg: any) =>
+                          alert(JSON.stringify(msg))
+                        )
+                      }}
+                    />
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell component="th" scope="row">
+                    Publish
+                  </TableCell>
+                  <TableCell>
+                    <Input
+                      submit="publish"
+                      fields={[`topic`, `message`]}
+                      onSubmit={val => {
+                        ipfs?.pubsub.publish(val[0], val[1])
+                      }}
+                    />
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell component="th" scope="row">
+                    Files
+                  </TableCell>
+                  <TableCell>
+                    <TableContainer>
+                      <TableBody>
+                        {files.map(file => (
+                          <TableRow>
+                            <TableCell>{file.name}</TableCell>
+                            <TableCell>{file.cid}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </TableContainer>
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </TableContainer>
         </Grid>
       </Grid>
-    </Grid>
+      <Dialog open={open} onClose={() => setOpen(false)}>
+        <DialogContent>{content}</DialogContent>
+      </Dialog>
+    </>
   )
 }
