@@ -10,7 +10,7 @@ react hook for ipfs
 
 For live example check <https://onichandame.com/react-ipfs-hook/>
 
-For detailed usage see [the exampl](./packages/example).
+For detailed usage see [the example](./packages/example).
 
 ```typescriptreact
 import React, { FC, useState, useEffect } from 'react'
@@ -22,7 +22,7 @@ const Component: FC = () => {
   const [id, setId] = useState(``)
   useEffect(() => {
     ipfs.id().then(id => setId(id))
-  })
+  }, [ipfs])
   return (
     <div>{id}</div>
   )
@@ -39,11 +39,11 @@ const Component: FC = () => {
   const [id, setId] = useState(``)
   useEffect(() => {
     ipfs.id().then(id => setId(id))
-  })
+  }, [ipfs])
   return (
     <div>{id}</div>
   )
 }
 ```
 
-Note: running an external IPFS daemon is recommended as the in-browser solution is still very limited and almost unusable. Check [my guide](https://onichandame.com/post/ipfs) for details.
+Note: running an external IPFS daemon is recommended as the in-browser node is still very limited and almost unusable. Check [my blog](https://onichandame.com/post/ipfs) for details.

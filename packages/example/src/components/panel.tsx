@@ -1,6 +1,7 @@
 import React, { FC, useCallback, useState, useEffect } from 'react'
 import { v1 as uuid } from 'uuid'
 import Ipfs from 'ipfs'
+import { useSnackbar } from 'notistack'
 import IpfsHttpClient from 'ipfs-http-client'
 import {
   Dialog,
@@ -22,6 +23,7 @@ type Props = {
 }
 
 export const Panel: FC<Props> = ({ ipfs }) => {
+  const { enqueueSnackbar } = useSnackbar()
   const fieldId = `file-${uuid()}`
   const [id, setId] = useState<string>(``)
   const [peers, setPeers] = useState<number>(0)
@@ -137,10 +139,11 @@ export const Panel: FC<Props> = ({ ipfs }) => {
                   </TableCell>
                   <TableCell>
                     <Input
+                      fields={[`topic`]}
                       submit="subscribe"
                       onSubmit={val => {
                         ipfs?.pubsub.subscribe(val, (msg: any) =>
-                          alert(JSON.stringify(msg))
+                          enqueueSnackbar(JSON.stringify(msg.data.toString()))
                         )
                       }}
                     />
