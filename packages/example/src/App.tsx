@@ -7,11 +7,11 @@ function App() {
   return (
     <div className="App">
       <Grid container direction="row" justify="center">
-        <Grid item xs={5}>
+        <Grid item xs={10} md={5}>
           <Embedded />
         </Grid>
         <Divider orientation="vertical" flexItem />
-        <Grid item xs={5}>
+        <Grid item xs={10} md={5}>
           <External />
         </Grid>
       </Grid>
