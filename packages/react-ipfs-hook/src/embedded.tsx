@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
-import Ipfs from 'ipfs'
+import { create } from 'ipfs'
+
+type Ipfs = ReturnType<typeof create>
 
 export const useIpfsEmbedded = (): [Ipfs | null, Error | null] => {
   const [ipfs, setIpfs] = useState<Ipfs | null>(null)
@@ -16,7 +18,7 @@ export const useIpfsEmbedded = (): [Ipfs | null, Error | null] => {
       } else {
         try {
           console.time('IPFS Started')
-          setIpfs(await Ipfs.create())
+          setIpfs(await create())
           console.timeEnd('IPFS Started')
           setError(null)
         } catch (e) {
@@ -32,7 +34,7 @@ export const useIpfsEmbedded = (): [Ipfs | null, Error | null] => {
       lock = null
       if (ipfs && ipfs.stop) {
         console.log('Stopping IPFS')
-        ipfs.stop().catch((err) => console.error(err))
+        ipfs.stop().catch((err: any) => console.error(err))
         setIpfs(null)
         setError(null)
       }

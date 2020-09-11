@@ -5,9 +5,9 @@
     "packages/*"
   ],
   "devDependencies": {
-    "husky": "^4.2.5",
+    "husky": "^4.3.0",
     "nodemon": "^2.0.4",
-    "prettier": "^2.1.0"
+    "prettier": "^2.1.1"
   },
   "prettier": {
     "printWidth": 80,
