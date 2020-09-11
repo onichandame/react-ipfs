@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react'
-import Ipfs from 'ipfs-http-client'
+import create from 'ipfs-http-client'
+import { PromiseValue } from 'type-fest'
+
+type Ipfs = PromiseValue<ReturnType<typeof create>>
 
 export const useIpfsHttpClient = (
-  ...opts: ConstructorParameters<typeof Ipfs>
+  ...opts: Parameters<typeof create>
 ): [Ipfs | null, Error | null] => {
   const [ipfs, setIpfs] = useState<Ipfs | null>(null)
   const [error, setError] = useState<Error | null>(null)
@@ -22,7 +25,7 @@ export const useIpfsHttpClient = (
             setError(new Error(`daemon address cannot be empty`))
           } else {
             console.time('IPFS Started')
-            setIpfs(new Ipfs(...opts))
+            setIpfs(create(...opts))
             console.timeEnd('IPFS Started')
             setError(null)
           }

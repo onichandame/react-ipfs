@@ -1,8 +1,7 @@
 import React, { FC, useCallback, useState, useEffect } from 'react'
 import { v1 as uuid } from 'uuid'
-import Ipfs from 'ipfs'
+import { useIpfs } from 'react-ipfs-hook'
 import { useSnackbar } from 'notistack'
-import IpfsHttpClient from 'ipfs-http-client'
 import {
   Dialog,
   DialogContent,
@@ -18,8 +17,10 @@ import {
 
 import { Input } from './common'
 
+type Ipfs = ReturnType<typeof useIpfs>[0]
+
 type Props = {
-  ipfs: Ipfs | IpfsHttpClient | null
+  ipfs: Ipfs | null
 }
 
 export const Panel: FC<Props> = ({ ipfs }) => {
@@ -41,7 +42,7 @@ export const Panel: FC<Props> = ({ ipfs }) => {
   }, [ipfs])
   useEffect(() => {
     if (ipfs) {
-      ipfs.id().then(id => setId(id.id))
+      ipfs.id().then((id: any) => setId(id.id))
       setInterval(async () => {
         setPeers((await ipfs.swarm.peers()).length)
       }, 1000)
@@ -141,10 +142,17 @@ export const Panel: FC<Props> = ({ ipfs }) => {
                     <Input
                       fields={[`topic`]}
                       submit="subscribe"
-                      onSubmit={val => {
-                        ipfs?.pubsub.subscribe(val, (msg: any) =>
-                          enqueueSnackbar(JSON.stringify(msg.data.toString()))
-                        )
+                      onSubmit={async val => {
+                        if (ipfs) {
+                          await ipfs?.pubsub.subscribe(val, function (
+                            msg: any
+                          ) {
+                            enqueueSnackbar(
+                              `received message ${msg.data.toString()}`
+                            )
+                          })
+                          enqueueSnackbar(`subscribed to ${val}`)
+                        }
                       }}
                     />
                   </TableCell>
@@ -157,8 +165,13 @@ export const Panel: FC<Props> = ({ ipfs }) => {
                     <Input
                       submit="publish"
                       fields={[`topic`, `message`]}
-                      onSubmit={val => {
-                        ipfs?.pubsub.publish(val[0], val[1])
+                      onSubmit={async val => {
+                        if (ipfs) {
+                          await ipfs.pubsub.publish(val[0], val[1])
+                          enqueueSnackbar(
+                            `published ${val[1]} to topic ${val[0]}`
+                          )
+                        }
                       }}
                     />
                   </TableCell>

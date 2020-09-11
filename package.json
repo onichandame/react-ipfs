@@ -22,10 +22,12 @@
   },
   "scripts": {
     "dev": "nodemon",
+    "hook": "yarn workspace react-ipfs-hook",
+    "example": "yarn workspace example",
     "build": "yarn build:hook && yarn build:example",
-    "build:hook": "yarn workspace react-ipfs-hook run build",
-    "build:example": "yarn workspace example run build",
-    "publish": "yarn workspace react-ipfs-hook publish"
+    "build:hook": "yarn hook run build",
+    "build:example": "yarn example run build",
+    "publish": "yarn hook publish"
   },
   "version": "0.0.0"
 }
