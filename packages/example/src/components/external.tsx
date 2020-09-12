@@ -29,7 +29,7 @@ export const External: FC = () => {
           </Grid>
         </Grid>
       </Grid>
-      <Grid item>{ipfsErr ? ipfsErr.message : <Panel ipfs={ipfs} />}</Grid>
+      <Grid item>{(ipfsErr && ipfsErr.message) || <Panel ipfs={ipfs} />}</Grid>
     </Grid>
   )
 }

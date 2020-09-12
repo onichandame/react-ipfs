@@ -12,7 +12,7 @@ import {
   Table,
   TableBody,
   TableRow,
-  TableCell,
+  TableCell
 } from '@material-ui/core'
 
 import { Input } from './common'
@@ -22,6 +22,8 @@ type Ipfs = ReturnType<typeof useIpfs>[0]
 type Props = {
   ipfs: Ipfs | null
 }
+
+const decoder = new TextDecoder()
 
 export const Panel: FC<Props> = ({ ipfs }) => {
   const { enqueueSnackbar } = useSnackbar()
@@ -144,11 +146,9 @@ export const Panel: FC<Props> = ({ ipfs }) => {
                       submit="subscribe"
                       onSubmit={async val => {
                         if (ipfs) {
-                          await ipfs?.pubsub.subscribe(val, function (
-                            msg: any
-                          ) {
+                          await ipfs?.pubsub.subscribe(val, function(msg: any) {
                             enqueueSnackbar(
-                              `received message ${msg.data.toString()}`
+                              `received message ${decoder.decode(msg.data)}`
                             )
                           })
                           enqueueSnackbar(`subscribed to ${val}`)
@@ -182,14 +182,16 @@ export const Panel: FC<Props> = ({ ipfs }) => {
                   </TableCell>
                   <TableCell>
                     <TableContainer>
-                      <TableBody>
-                        {files.map(file => (
-                          <TableRow>
-                            <TableCell>{file.name}</TableCell>
-                            <TableCell>{file.cid}</TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
+                      <Table size="small" aria-label={`file list ${uuid()}`}>
+                        <TableBody>
+                          {files.map(file => (
+                            <TableRow key={`file-${uuid()}`}>
+                              <TableCell>{file.name}</TableCell>
+                              <TableCell>{file.cid}</TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
                     </TableContainer>
                   </TableCell>
                 </TableRow>

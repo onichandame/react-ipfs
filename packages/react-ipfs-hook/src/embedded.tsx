@@ -19,7 +19,7 @@ export const useIpfsEmbedded = (): [Ipfs | null, Error | null] => {
       } else {
         try {
           console.time('IPFS Started')
-          setIpfs(await create())
+          setIpfs(await create({ EXPERIMENTAL: { ipnsPubsub: true } }))
           console.timeEnd('IPFS Started')
           setError(null)
         } catch (e) {

@@ -11,7 +11,7 @@ export const Embedded: FC = () => {
       <Grid item>
         <Typography variant="h5">Embedded IPFS Node:</Typography>
       </Grid>
-      <Grid item>{ipfsErr ? ipfsErr.message : <Panel ipfs={ipfs} />}</Grid>
+      <Grid item>{(ipfsErr && ipfsErr.message) || <Panel ipfs={ipfs} />}</Grid>
     </Grid>
   )
 }
