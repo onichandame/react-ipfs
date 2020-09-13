@@ -10,9 +10,6 @@ export const useIpfsEmbedded = (): [Ipfs | null, Error | null] => {
 
   let lock: Promise<any> | null = null
   useEffect(() => {
-    // The fn to useEffect should not return anything other than a cleanup fn,
-    // So it cannot be marked async, which causes it to return a promise,
-    // Hence we delegate to a async fn rather than making the param an async fn.
     async function startIpfs() {
       if (ipfs) {
         console.log('IPFS already started')
