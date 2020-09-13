@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom'
 import { CssBaseline } from '@material-ui/core'
 import { SnackbarProvider } from 'notistack'
 
-import './index.css'
 import App from './App'
 import * as serviceWorker from './serviceWorker'
 
