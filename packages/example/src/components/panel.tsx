@@ -12,7 +12,7 @@ import {
   Table,
   TableBody,
   TableRow,
-  TableCell
+  TableCell,
 } from '@material-ui/core'
 
 import { Input } from './common'
@@ -23,6 +23,7 @@ type Props = {
   ipfs: Ipfs | null
 }
 
+const encoder = new TextEncoder()
 const decoder = new TextDecoder()
 
 export const Panel: FC<Props> = ({ ipfs }) => {
@@ -146,7 +147,9 @@ export const Panel: FC<Props> = ({ ipfs }) => {
                       submit="subscribe"
                       onSubmit={async val => {
                         if (ipfs) {
-                          await ipfs?.pubsub.subscribe(val, function(msg: any) {
+                          await ipfs?.pubsub.subscribe(val, function (
+                            msg: any
+                          ) {
                             enqueueSnackbar(
                               `received message ${decoder.decode(msg.data)}`
                             )
@@ -167,7 +170,10 @@ export const Panel: FC<Props> = ({ ipfs }) => {
                       fields={[`topic`, `message`]}
                       onSubmit={async val => {
                         if (ipfs) {
-                          await ipfs.pubsub.publish(val[0], val[1])
+                          await ipfs.pubsub.publish(
+                            val[0],
+                            encoder.encode(val[1])
+                          )
                           enqueueSnackbar(
                             `published ${val[1]} to topic ${val[0]}`
                           )
