@@ -44,7 +44,7 @@ export const Panel: FC<Props> = ({ ipfs }) => {
     }
   }, [ipfs])
   useEffect(() => {
-    if (ipfs) {
+    if (ipfs && ipfs.id) {
       ipfs.id().then((id: any) => setId(id.id))
       setInterval(async () => {
         setPeers((await ipfs.swarm.peers()).length)

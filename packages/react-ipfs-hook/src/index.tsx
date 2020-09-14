@@ -1,17 +1,52 @@
-import { useIpfsEmbedded } from './embedded'
-import { useIpfsHttpClient } from './httpClient'
+import { useState, useEffect } from 'react'
+import createExternal from 'ipfs-http-client'
+import { create as createEmbedded } from 'ipfs'
+import { PromiseValue } from 'type-fest'
 
-type ExternalProps = {
-  external: true
-  opts: Parameters<typeof useIpfsHttpClient>[0]
+type Props = {
+  external: boolean
+  opts: Parameters<typeof createExternal>[0]
 }
-type EmbeddedProps = {
-  external?: false
-}
 
-type Props = ExternalProps | EmbeddedProps
+type Ipfs =
+  | PromiseValue<ReturnType<typeof createExternal>>
+  | PromiseValue<ReturnType<typeof createEmbedded>>
 
-export const useIpfs = (opts?: Props) => {
-  if (opts && opts.external) return useIpfsHttpClient(opts.opts)
-  else return useIpfsEmbedded()
+export const useIpfs = (
+  { opts, external }: Props = { external: false, opts: `http://localhost:5001` }
+): [Ipfs | null, Error | null] => {
+  const [ipfs, setIpfs] = useState<Ipfs | null>(null)
+  const [error, setError] = useState<Error | null>(null)
+
+  useEffect(() => {
+    async function stopIpfs() {
+      if (ipfs && ipfs.stop) return ipfs.stop()
+    }
+    async function startIpfs() {
+      try {
+        if (!opts && external) {
+          setIpfs(null)
+          setError(new Error(`daemon address cannot be empty`))
+        }
+        console.time('IPFS Started')
+        if (external)
+          if (opts) setIpfs(createExternal(opts))
+          else throw new Error(`daemon address cannot be empty`)
+        else setIpfs(createEmbedded())
+        console.timeEnd('IPFS Started')
+        setError(null)
+      } catch (e) {
+        console.error('IPFS init error:', e)
+        setIpfs(null)
+        setError(e)
+      }
+    }
+    stopIpfs().then(() => startIpfs())
+
+    return () => {
+      stopIpfs()
+    }
+  }, [external, opts])
+
+  return [ipfs, error]
 }

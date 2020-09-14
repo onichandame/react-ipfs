@@ -12,6 +12,8 @@ For live example check <https://onichandame.com/react-ipfs-hook/>
 
 For detailed usage see [the example](./packages/example).
 
+**Embedded node is not a fully-functioning IPFS node yet. it lacks some DHT and pubsub functionalities. It is recommended to use the external mode. Remember to enable experimental features if needed.**
+
 ```typescriptreact
 import React, { FC, useState, useEffect } from 'react'
 import { useIpfs } from `react-ipfs-hook`
