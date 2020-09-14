@@ -45,11 +45,16 @@ export const Panel: FC<Props> = ({ ipfs }) => {
   }, [ipfs])
   useEffect(() => {
     if (ipfs && ipfs.id) {
-      ipfs.id().then((id: any) => setId(id.id))
-      setInterval(async () => {
+      ipfs.id().then((id: any) => {
+        setId(id.id)
+        updateFiles()
+      })
+      const peersTimer = setInterval(async () => {
         setPeers((await ipfs.swarm.peers()).length)
       }, 1000)
-      updateFiles()
+      return () => {
+        clearInterval(peersTimer)
+      }
     }
   }, [ipfs, updateFiles])
   const readFile = useCallback(

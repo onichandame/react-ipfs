@@ -24,15 +24,13 @@ export const useIpfs = (
     }
     async function startIpfs() {
       try {
-        if (!opts && external) {
+        if (external && !opts) {
           setIpfs(null)
           setError(new Error(`daemon address cannot be empty`))
         }
         console.time('IPFS Started')
-        if (external)
-          if (opts) setIpfs(createExternal(opts))
-          else throw new Error(`daemon address cannot be empty`)
-        else setIpfs(createEmbedded())
+        if (external) setIpfs(createExternal(opts))
+        else setIpfs(await createEmbedded())
         console.timeEnd('IPFS Started')
         setError(null)
       } catch (e) {
