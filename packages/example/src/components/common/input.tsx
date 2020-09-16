@@ -11,7 +11,7 @@ type Props = {
 export const Input: FC<Props> = ({
   fields = 1,
   onSubmit,
-  submit = `submit`
+  submit = `submit`,
 }) => {
   const length = typeof fields === 'number' ? fields : fields.length
   const [val, setVal] = useState<string[]>(() => {
@@ -30,6 +30,7 @@ export const Input: FC<Props> = ({
       {Array.from(new Array(length)).map((_, index) => (
         <TextField
           key={`${label}-${index}`}
+          placeholder={Array.isArray(fields) ? fields[index] : ``}
           onChange={e => {
             const newArr = Array.from(val)
             newArr[index] = e.currentTarget.value

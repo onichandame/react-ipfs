@@ -152,9 +152,7 @@ export const Panel: FC<Props> = ({ ipfs }) => {
                       submit="subscribe"
                       onSubmit={async val => {
                         if (ipfs) {
-                          await ipfs?.pubsub.subscribe(val, function (
-                            msg: any
-                          ) {
+                          await ipfs.pubsub.subscribe(val[0], (msg: any) => {
                             enqueueSnackbar(
                               `received message ${decoder.decode(msg.data)}`
                             )

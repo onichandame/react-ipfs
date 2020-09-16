@@ -30,7 +30,13 @@ export const useIpfs = (
         }
         console.time('IPFS Started')
         if (external) setIpfs(createExternal(opts))
-        else setIpfs(await createEmbedded())
+        else
+          setIpfs(
+            await createEmbedded({}).then(async (ipfs) => {
+              await ipfs.start()
+              return ipfs
+            })
+          )
         console.timeEnd('IPFS Started')
         setError(null)
       } catch (e) {
