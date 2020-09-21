@@ -20,7 +20,11 @@ export const useIpfs = (
 
   useEffect(() => {
     async function stopIpfs() {
-      if (ipfs && ipfs.stop) return ipfs.stop()
+      const tmp = ipfs
+      setIpfs(null)
+      setError(null)
+      // only shutdown embedded node when external: false --> true
+      if (external && tmp && tmp.stop) return tmp.stop()
     }
     async function startIpfs() {
       try {

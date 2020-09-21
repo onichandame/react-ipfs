@@ -63,7 +63,7 @@ export const Panel: FC<Props> = ({ ipfs }) => {
         try {
           let result = ``
           for await (const file of ipfs.cat(addr)) {
-            result = file.toString()
+            result = decoder.decode(file)
             break // Read only one file
           }
           setContent(result)

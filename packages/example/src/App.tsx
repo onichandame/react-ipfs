@@ -32,7 +32,11 @@ function App() {
               } IPFS Node`}</Typography>
             </Grid>
             <Grid item>
-              {(ipfsErr && ipfsErr.message) || <Panel ipfs={ipfs} />}
+              {(ipfsErr && ipfsErr.message) || ipfs ? (
+                <Panel ipfs={ipfs} />
+              ) : (
+                `loading`
+              )}
             </Grid>
           </Grid>
         </div>
