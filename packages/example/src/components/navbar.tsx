@@ -7,11 +7,12 @@ import {
   Typography,
 } from '@material-ui/core'
 
-import { External, ExternalUrl } from '../context'
+import { External, ExternalUrl, Ipfs } from '../context'
 
 export const NavBar: FC = () => {
   const { externalUrl, setExternalUrl } = useContext(ExternalUrl)
   const { external, toggleExternal } = useContext(External)
+  const { ipfs, ipfsErr } = useContext(Ipfs)
   return (
     <AppBar position="static">
       <Toolbar>
@@ -22,9 +23,14 @@ export const NavBar: FC = () => {
         <Typography variant="h6" noWrap>
           {external ? `External` : `Embedded`}
         </Typography>
-        <Switch value={external} onChange={toggleExternal} />
+        <Switch
+          disabled={!ipfs && !ipfsErr}
+          value={external}
+          onChange={toggleExternal}
+        />
         {external && (
           <TextField
+            disabled={!ipfs && !ipfsErr}
             defaultValue={externalUrl}
             onBlur={e => setExternalUrl(e.currentTarget.value)}
           />

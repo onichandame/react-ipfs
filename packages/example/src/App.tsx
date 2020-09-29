@@ -4,7 +4,7 @@ import { useIpfs } from 'react-ipfs-hook'
 import { Grid, Typography } from '@material-ui/core'
 
 import { Panel, NavBar } from './components'
-import { External, ExternalUrl } from './context'
+import { External, ExternalUrl, Ipfs } from './context'
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -21,27 +21,34 @@ function App() {
   const [external, toggleExternal] = useReducer(old => !old, true)
   const [ipfs, ipfsErr] = useIpfs({ external, opts: externalUrl })
   return (
-    <ExternalUrl.Provider value={{ setExternalUrl, externalUrl }}>
-      <External.Provider value={{ external, toggleExternal }}>
-        <div className={styles.root}>
-          <NavBar />
-          <Grid container spacing={2} direction={'column'} alignItems="center">
-            <Grid item>
-              <Typography variant="h5">{`${
-                external ? `External` : `Embedded`
-              } IPFS Node`}</Typography>
+    <Ipfs.Provider value={{ ipfs, ipfsErr }}>
+      <ExternalUrl.Provider value={{ setExternalUrl, externalUrl }}>
+        <External.Provider value={{ external, toggleExternal }}>
+          <div className={styles.root}>
+            <NavBar />
+            <Grid
+              container
+              spacing={2}
+              direction={'column'}
+              alignItems="center"
+            >
+              <Grid item>
+                <Typography variant="h5">{`${
+                  external ? `External` : `Embedded`
+                } IPFS Node`}</Typography>
+              </Grid>
+              <Grid item>
+                {(ipfsErr && ipfsErr.message) || ipfs ? (
+                  <Panel ipfs={ipfs} />
+                ) : (
+                  `loading`
+                )}
+              </Grid>
             </Grid>
-            <Grid item>
-              {(ipfsErr && ipfsErr.message) || ipfs ? (
-                <Panel ipfs={ipfs} />
-              ) : (
-                `loading`
-              )}
-            </Grid>
-          </Grid>
-        </div>
-      </External.Provider>
-    </ExternalUrl.Provider>
+          </div>
+        </External.Provider>
+      </ExternalUrl.Provider>
+    </Ipfs.Provider>
   )
 }
 

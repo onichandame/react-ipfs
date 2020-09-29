@@ -12,6 +12,12 @@ type Ipfs =
   | PromiseValue<ReturnType<typeof createExternal>>
   | PromiseValue<ReturnType<typeof createEmbedded>>
 
+declare global {
+  interface Window {
+    ipfs?: Ipfs
+  }
+}
+
 export const useIpfs = (
   { opts, external }: Props = { external: false, opts: `http://localhost:5001` }
 ): [Ipfs | null, Error | null] => {
@@ -20,11 +26,8 @@ export const useIpfs = (
 
   useEffect(() => {
     async function stopIpfs() {
-      const tmp = ipfs
       setIpfs(null)
       setError(null)
-      // only shutdown embedded node when external: false --> true
-      if (external && tmp && tmp.stop) return tmp.stop()
     }
     async function startIpfs() {
       try {
@@ -36,10 +39,12 @@ export const useIpfs = (
         if (external) setIpfs(createExternal(opts))
         else
           setIpfs(
-            await createEmbedded({}).then(async (ipfs) => {
-              await ipfs.start()
-              return ipfs
-            })
+            window.ipfs ||
+              (await createEmbedded({}).then(async (ipfs) => {
+                window.ipfs = ipfs
+                await ipfs.start()
+                return ipfs
+              }))
           )
         console.timeEnd('IPFS Started')
         setError(null)
