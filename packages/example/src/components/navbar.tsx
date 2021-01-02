@@ -30,12 +30,17 @@ export const NavBar: FC = () => {
   const [ipfs, ipfsErr] = useIpfs()
   const [peers, setPeers] = useState(0)
   useEffect(() => {
-    if (ipfs && !ipfsErr) {
-      ipfs.peers().then((prs: any[]) => {
-        setPeers(prs.length)
-      })
+    const job = setInterval(() => {
+      if (ipfs && !ipfsErr) {
+        ipfs.swarm.peers().then((prs: any[]) => {
+          setPeers(prs.length)
+        })
+      }
+    }, 1000)
+    return () => {
+      clearInterval(job)
     }
-  })
+  }, [ipfs, ipfsErr])
   return (
     <AppBar position="static">
       <Toolbar>
