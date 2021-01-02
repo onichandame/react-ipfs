@@ -1,16 +1,13 @@
-import { useState, useEffect } from 'react'
-import createExternal from 'ipfs-http-client'
-import { create as createEmbedded } from 'ipfs'
-import { PromiseValue } from 'type-fest'
+import React, {
+  FC,
+  useContext,
+  createContext,
+  useState,
+  useEffect,
+} from 'react'
+import { create } from 'ipfs'
 
-type Props = {
-  external: boolean
-  opts: Parameters<typeof createExternal>[0]
-}
-
-type Ipfs =
-  | PromiseValue<ReturnType<typeof createExternal>>
-  | PromiseValue<ReturnType<typeof createEmbedded>>
+type Ipfs = any
 
 declare global {
   interface Window {
@@ -18,8 +15,8 @@ declare global {
   }
 }
 
-export const useIpfs = (
-  { opts, external }: Props = { external: false, opts: `http://localhost:5001` }
+const useIpfsHook = (
+  ...args: Parameters<typeof create>
 ): [Ipfs | null, Error | null] => {
   const [ipfs, setIpfs] = useState<Ipfs | null>(null)
   const [error, setError] = useState<Error | null>(null)
@@ -31,21 +28,15 @@ export const useIpfs = (
     }
     async function startIpfs() {
       try {
-        if (external && !opts) {
-          setIpfs(null)
-          setError(new Error(`daemon address cannot be empty`))
-        }
         console.time('IPFS Started')
-        if (external) setIpfs(createExternal(opts))
-        else
-          setIpfs(
-            window.ipfs ||
-              (await createEmbedded({}).then(async (ipfs) => {
-                window.ipfs = ipfs
-                await ipfs.start()
-                return ipfs
-              }))
-          )
+        setIpfs(
+          window.ipfs ||
+            (await create(...args).then(async ipfs => {
+              window.ipfs = ipfs
+              await ipfs.start()
+              return ipfs
+            }))
+        )
         console.timeEnd('IPFS Started')
         setError(null)
       } catch (e) {
@@ -59,7 +50,22 @@ export const useIpfs = (
     return () => {
       stopIpfs()
     }
-  }, [external, opts])
+  }, args)
 
   return [ipfs, error]
+}
+
+const Context = createContext<[Ipfs | null, Error | null]>([null, null])
+
+type Props = {
+  args?: Parameters<typeof useIpfsHook>[0]
+}
+export const IpfsProvider: FC<Props> = ({ children, args }) => {
+  const [ipfs, err] = useIpfsHook(args)
+  return <Context.Provider value={[ipfs, err]}>{children}</Context.Provider>
+}
+
+export const useIpfs = () => {
+  const con = useContext(Context)
+  return con
 }

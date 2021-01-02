@@ -2,6 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import { CssBaseline } from '@material-ui/core'
 import { SnackbarProvider } from 'notistack'
+import { IpfsProvider } from 'react-ipfs-hook'
 
 import App from './App'
 import * as serviceWorker from './serviceWorker'
@@ -11,7 +12,9 @@ ReactDOM.render(
     <>
       <CssBaseline />
       <SnackbarProvider maxSnack={3}>
-        <App />
+        <IpfsProvider>
+          <App />
+        </IpfsProvider>
       </SnackbarProvider>
     </>
   </React.StrictMode>,

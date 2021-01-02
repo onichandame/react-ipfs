@@ -1,18 +1,41 @@
-import React, { FC, useContext } from 'react'
+import React, { FC, useState, useEffect } from 'react'
 import {
-  TextField,
-  Switch,
-  AppBar,
-  Toolbar,
-  Typography,
-} from '@material-ui/core'
+  SignalCellular0Bar,
+  SignalCellular1Bar,
+  SignalCellular2Bar,
+  SignalCellular3Bar,
+  SignalCellular4Bar,
+  SignalCellularConnectedNoInternet0Bar,
+} from '@material-ui/icons'
+import { AppBar, Toolbar, Typography } from '@material-ui/core'
+import { useIpfs } from 'react-ipfs-hook'
 
-import { External, ExternalUrl, Ipfs } from '../context'
+const SignalIcon: FC<{ number: number }> = ({ number }) => {
+  return number <= 0 ? (
+    <SignalCellularConnectedNoInternet0Bar />
+  ) : number < 10 ? (
+    <SignalCellular0Bar />
+  ) : number < 64 ? (
+    <SignalCellular1Bar />
+  ) : number < 128 ? (
+    <SignalCellular2Bar />
+  ) : number < 256 ? (
+    <SignalCellular3Bar />
+  ) : (
+    <SignalCellular4Bar />
+  )
+}
 
 export const NavBar: FC = () => {
-  const { externalUrl, setExternalUrl } = useContext(ExternalUrl)
-  const { external, toggleExternal } = useContext(External)
-  const { ipfs, ipfsErr } = useContext(Ipfs)
+  const [ipfs, ipfsErr] = useIpfs()
+  const [peers, setPeers] = useState(0)
+  useEffect(() => {
+    if (ipfs && !ipfsErr) {
+      ipfs.peers().then((prs: any[]) => {
+        setPeers(prs.length)
+      })
+    }
+  })
   return (
     <AppBar position="static">
       <Toolbar>
@@ -20,21 +43,7 @@ export const NavBar: FC = () => {
           IPFS
         </Typography>
         <div style={{ flexGrow: 1 }} />
-        <Typography variant="h6" noWrap>
-          {external ? `External` : `Embedded`}
-        </Typography>
-        <Switch
-          disabled={!ipfs && !ipfsErr}
-          value={external}
-          onChange={toggleExternal}
-        />
-        {external && (
-          <TextField
-            disabled={!ipfs && !ipfsErr}
-            defaultValue={externalUrl}
-            onBlur={e => setExternalUrl(e.currentTarget.value)}
-          />
-        )}
+        <SignalIcon number={peers} />
       </Toolbar>
     </AppBar>
   )

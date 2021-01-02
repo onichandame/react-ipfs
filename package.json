@@ -5,9 +5,9 @@
     "packages/*"
   ],
   "devDependencies": {
-    "husky": "^4.3.0",
-    "nodemon": "^2.0.4",
-    "prettier": "^2.1.1"
+    "husky": "^4.3.6",
+    "nodemon": "^2.0.6",
+    "prettier": "^2.2.1"
   },
   "prettier": {
     "printWidth": 80,
@@ -22,6 +22,7 @@
   },
   "scripts": {
     "dev": "nodemon",
+    "test": "yarn hook test",
     "hook": "yarn workspace react-ipfs-hook",
     "example": "yarn workspace example",
     "build": "yarn build:hook && yarn build:example",
