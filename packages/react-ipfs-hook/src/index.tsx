@@ -28,16 +28,16 @@ const useIpfsHook = (
     }
     async function startIpfs() {
       try {
-        console.time('IPFS Started')
+        const msg = `IPFS Created`
+        console.time(msg)
         setIpfs(
           window.ipfs ||
-            (await create(...args).then(async ipfs => {
+            (await create(...args).then(async (ipfs) => {
               window.ipfs = ipfs
-              await ipfs.start()
               return ipfs
             }))
         )
-        console.timeEnd('IPFS Started')
+        console.timeEnd(msg)
         setError(null)
       } catch (e) {
         console.error('IPFS init error:', e)

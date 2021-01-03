@@ -1,5 +1,7 @@
-import React, { FC, useState, useEffect } from 'react'
+import React, { useEffect, useContext, MouseEvent, FC, useState } from 'react'
+import { v4 as randStr } from 'uuid'
 import {
+  Group,
   SignalCellular0Bar,
   SignalCellular1Bar,
   SignalCellular2Bar,
@@ -7,8 +9,18 @@ import {
   SignalCellular4Bar,
   SignalCellularConnectedNoInternet0Bar,
 } from '@material-ui/icons'
-import { AppBar, Toolbar, Typography } from '@material-ui/core'
+import {
+  Menu,
+  Badge,
+  MenuItem,
+  IconButton,
+  AppBar,
+  Toolbar,
+  Typography,
+} from '@material-ui/core'
 import { useIpfs } from 'react-ipfs-hook'
+
+import { Peers } from '../context'
 
 const SignalIcon: FC<{ number: number }> = ({ number }) => {
   return number <= 0 ? (
@@ -27,29 +39,75 @@ const SignalIcon: FC<{ number: number }> = ({ number }) => {
 }
 
 export const NavBar: FC = () => {
-  const [ipfs, ipfsErr] = useIpfs()
-  const [peers, setPeers] = useState(0)
+  const [ipfs] = useIpfs()
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
+  const [menuId] = useState(randStr())
+  const [peerNum, setPeerNum] = useState(0)
+
+  const peers = useContext(Peers)
+
   useEffect(() => {
-    const job = setInterval(() => {
-      if (ipfs && !ipfsErr) {
-        ipfs.swarm.peers().then((prs: any[]) => {
-          setPeers(prs.length)
-        })
-      }
-    }, 1000)
-    return () => {
-      clearInterval(job)
-    }
-  }, [ipfs, ipfsErr])
+    if (peers.length !== peerNum) setPeerNum(peers.length)
+  }, [peers, peerNum])
+
+  const openMenu = (e: MouseEvent<HTMLElement>) => {
+    setAnchorEl(e.currentTarget)
+  }
+  const closeMenu = () => {
+    setAnchorEl(null)
+  }
+
   return (
-    <AppBar position="static">
-      <Toolbar>
-        <Typography variant="h6" noWrap>
-          IPFS
-        </Typography>
-        <div style={{ flexGrow: 1 }} />
-        <SignalIcon number={peers} />
-      </Toolbar>
-    </AppBar>
+    <div style={{ flexGrow: 1 }}>
+      <AppBar position="static">
+        <Toolbar>
+          <Typography variant="h6" noWrap>
+            IPFS
+          </Typography>
+          <div style={{ flexGrow: 1 }} />
+          <IconButton>
+            <Badge badgeContent={peerNum}>
+              <Group />
+            </Badge>
+          </IconButton>
+          <IconButton
+            edge="end"
+            aria-label="ipfs node"
+            aria-controls={menuId}
+            aria-haspopup="true"
+            onClick={openMenu}
+          >
+            <SignalIcon number={peerNum} />
+          </IconButton>
+        </Toolbar>
+      </AppBar>
+      <Menu
+        anchorEl={anchorEl}
+        getContentAnchorEl={null}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+        id={menuId}
+        keepMounted
+        open={!!anchorEl}
+        onClose={closeMenu}
+      >
+        <MenuItem
+          onClick={() => {
+            closeMenu()
+            ipfs && !ipfs.isOnline() && ipfs.start()
+          }}
+        >
+          Start
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            closeMenu()
+            ipfs && ipfs.isOnline() && ipfs.stop()
+          }}
+        >
+          Stop
+        </MenuItem>
+      </Menu>
+    </div>
   )
 }

@@ -50,7 +50,7 @@ export const Panel: FC<Props> = ({ ipfs }) => {
         updateFiles()
       })
       const peersTimer = setInterval(async () => {
-        setPeers((await ipfs.swarm.peers()).length)
+        if (ipfs && ipfs.isOnline()) setPeers((await ipfs.swarm.peers()).length)
       }, 1000)
       return () => {
         clearInterval(peersTimer)
