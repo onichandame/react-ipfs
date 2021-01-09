@@ -36,9 +36,9 @@ function App() {
       } else {
         reset()
       }
-      return () => clearInterval(job)
     }, 1000)
-  }, [ipfs, ipfsErr, peers])
+    return () => clearInterval(job)
+  }, [ipfs, ipfsErr])
   return (
     <Peers.Provider value={peers}>
       <Id.Provider value={id}>

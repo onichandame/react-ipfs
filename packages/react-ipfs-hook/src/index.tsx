@@ -40,7 +40,7 @@ const useIpfsHook = (
         console.timeEnd(msg)
         setError(null)
       } catch (e) {
-        console.error('IPFS init error:', e)
+        console.error('IPFS creation error:', e)
         setIpfs(null)
         setError(e)
       }
