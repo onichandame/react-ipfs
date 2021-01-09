@@ -1,6 +1,6 @@
 import React, { FC, useCallback, useState, useEffect } from 'react'
 import { v1 as uuid } from 'uuid'
-import { useIpfs } from 'react-ipfs-hook'
+import { useIpfs } from '@onichandame/react-ipfs-hook'
 import { useSnackbar } from 'notistack'
 import {
   Dialog,

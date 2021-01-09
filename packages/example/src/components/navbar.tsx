@@ -18,7 +18,7 @@ import {
   Toolbar,
   Typography,
 } from '@material-ui/core'
-import { useIpfs } from 'react-ipfs-hook'
+import { useIpfs } from '@onichandame/react-ipfs-hook'
 
 import { Peers } from '../context'
 

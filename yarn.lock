@@ -13584,6 +13584,14 @@ react-error-overlay@^6.0.7:
   resolved "http://npm-verdaccio.verdaccio.svc.cluster.local:4873/react-error-overlay/-/react-error-overlay-6.0.8.tgz#474ed11d04fc6bda3af643447d85e9127ed6b5de"
   integrity sha1-R07RHQT8a9o69kNEfYXpEn7Wtd4=
 
+react-ipfs-hook@0.2.4:
+  version "0.2.4"
+  resolved "http://npm-verdaccio.verdaccio.svc.cluster.local:4873/react-ipfs-hook/-/react-ipfs-hook-0.2.4.tgz#f3fc9bba3b8fe6c6bdf13dc57cc915722f8c60ee"
+  integrity sha1-8/ybujuP5sa98T3FfMkVci+MYO4=
+  dependencies:
+    ipfs "^0.50.2"
+    type-fest "^0.16.0"
+
 react-is@^16.7.0, react-is@^16.8.1, react-is@^16.8.4:
   version "16.13.1"
   resolved "http://npm-verdaccio.verdaccio.svc.cluster.local:4873/react-is/-/react-is-16.13.1.tgz#789729a4dc36de2999dc156dd6c1d9c18cea56a4"
@@ -15777,6 +15785,11 @@ type-fest@^0.11.0:
   version "0.11.0"
   resolved "http://npm-verdaccio.verdaccio.svc.cluster.local:4873/type-fest/-/type-fest-0.11.0.tgz#97abf0872310fed88a5c466b25681576145e33f1"
   integrity sha1-l6vwhyMQ/tiKXEZrJWgVdhReM/E=
+
+type-fest@^0.16.0:
+  version "0.16.0"
+  resolved "http://npm-verdaccio.verdaccio.svc.cluster.local:4873/type-fest/-/type-fest-0.16.0.tgz#3240b891a78b0deae910dbeb86553e552a148860"
+  integrity sha1-MkC4kaeLDerpENvrhlU+VSoUiGA=
 
 type-fest@^0.8.1:
   version "0.8.1"

@@ -23,7 +23,7 @@
   "scripts": {
     "dev": "nodemon",
     "test": "yarn hook test",
-    "hook": "yarn workspace react-ipfs-hook",
+    "hook": "yarn workspace @onichandame/react-ipfs-hook",
     "example": "yarn workspace example",
     "build": "yarn build:hook && yarn build:example",
     "build:hook": "yarn hook run build",

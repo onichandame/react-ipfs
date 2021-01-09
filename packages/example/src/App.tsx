@@ -1,6 +1,6 @@
 import React, { ContextType, useEffect, useState } from 'react'
 import { makeStyles } from '@material-ui/core/styles'
-import { useIpfs } from 'react-ipfs-hook'
+import { useIpfs } from '@onichandame/react-ipfs-hook'
 import { Grid } from '@material-ui/core'
 
 import { Panel, NavBar } from './components'

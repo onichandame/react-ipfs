@@ -2,7 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import { CssBaseline } from '@material-ui/core'
 import { SnackbarProvider } from 'notistack'
-import { IpfsProvider } from 'react-ipfs-hook'
+import { IpfsProvider } from '@onichandame/react-ipfs-hook'
 
 import App from './App'
 import * as serviceWorker from './serviceWorker'
