@@ -5,106 +5,55 @@ import React, {
   useState,
   useEffect,
 } from 'react'
-import { create } from 'ipfs'
+import { create as createIpfs } from 'ipfs'
 import createHttpClient from 'ipfs-http-client'
 
-type Ipfs = any
+type AsyncOrSync<T> = Promise<T> | T
 
-type HookContent = [Ipfs | null, Error | null]
+type Ipfs = AsyncOrSync<any> | null
 
-declare global {
-  interface Window {
-    ipfs?: Ipfs
-  }
-}
+type EmbeddedArgs = Parameters<typeof createIpfs>[0]
+type ExternalArgs = Parameters<typeof createHttpClient>[0]
 
-const useEmbeddedIpfs = (...args: Parameters<typeof create>): HookContent => {
-  const [ipfs, setIpfs] = useState<Ipfs | null>(null)
-  const [error, setError] = useState<Error | null>(null)
-
-  useEffect(() => {
-    async function stopIpfs() {
-      setIpfs(null)
-      setError(null)
-    }
-    async function startIpfs() {
-      try {
-        const msg = `IPFS Created`
-        console.time(msg)
-        setIpfs(
-          window.ipfs ||
-            (await create(...args).then(async (ipfs) => {
-              window.ipfs = ipfs
-              return ipfs
-            }))
-        )
-        console.timeEnd(msg)
-        setError(null)
-      } catch (e) {
-        console.error('IPFS creation error:', e)
-        setIpfs(null)
-        setError(e)
-      }
-    }
-    stopIpfs().then(() => startIpfs())
-
-    return () => {
-      stopIpfs()
-    }
-  }, args)
-
-  return [ipfs, error]
-}
-
-export const useExternalIpfs = (
-  ...args: Parameters<typeof createHttpClient>
-): HookContent => {
-  const [ipfs, setIpfs] = useState<Ipfs | null>(null)
-  const [error, setError] = useState<Error | null>(null)
+const useIpfsInstance = (
+  args:
+    | { mode: 'embedded'; args: EmbeddedArgs }
+    | { mode: 'external'; args: ExternalArgs }
+): Ipfs => {
+  const [ipfs, setIpfs] = useState<Ipfs>(null)
 
   useEffect(() => {
     function clear() {
       setIpfs(null)
-      setError(null)
     }
-    function init() {
-      try {
-        const msg = `IPFS HTTP Client Created`
-        console.time(msg)
-        const client = createHttpClient(...args)
-        setIpfs(client)
-        console.timeEnd(msg)
-        setError(null)
-      } catch (e) {
-        console.error('IPFS creation error:', e)
-        setIpfs(null)
-        setError(e)
-      }
+    switch (args.mode) {
+      case `external`:
+        setIpfs(createHttpClient(args.args))
+        break
+      case `embedded`:
+        setIpfs(createIpfs(args.args))
+        break
+      default:
+        throw new Error(`mode ${(args as any).mode} not supported!`)
     }
-    clear()
-    init()
 
     return clear
-  }, args)
+  }, [args, args.mode, args.args])
 
-  return [ipfs, error]
+  return ipfs
 }
 
 const Context = createContext<[Ipfs | null, Error | null]>([null, null])
 
-type Props = {
-  args?:
-    | Parameters<typeof useEmbeddedIpfs>[0]
-    | Parameters<typeof useExternalIpfs>[0]
-}
-export const IpfsProvider: FC<Props> = ({ children, args }) => {
-  const [embedded, embeddedErr] = useEmbeddedIpfs(args)
-  const [external, externalErr] = useExternalIpfs(args)
-  const [content, setContent] = useState<HookContent>([embedded, embeddedErr])
-  return <Context.Provider value={content}>{children}</Context.Provider>
+export const IpfsProvider: FC<Parameters<typeof useIpfsInstance>[0]> = ({
+  children,
+  ...others
+}) => {
+  const ipfs = useIpfsInstance(others)
+  return <Context.Provider value={ipfs}>{children}</Context.Provider>
 }
 
 export const useIpfs = () => {
-  const con = useContext(Context)
-  return con
+  const ipfs = useContext(Context)
+  return ipfs
 }
