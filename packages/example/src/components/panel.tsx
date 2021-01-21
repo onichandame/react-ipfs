@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useState, useEffect } from 'react'
+import React, { useContext, FC, useCallback, useState, useEffect } from 'react'
 import { v1 as uuid } from 'uuid'
 import { useIpfs } from '@onichandame/react-ipfs-hook'
 import { useSnackbar } from 'notistack'
@@ -16,49 +16,41 @@ import {
 } from '@material-ui/core'
 
 import { Input } from './common'
-
-type Ipfs = ReturnType<typeof useIpfs>[0]
-
-type Props = {
-  ipfs: Ipfs | null
-}
+import { Status, PeerNum, Id } from '../context'
 
 const encoder = new TextEncoder()
 const decoder = new TextDecoder()
 
-export const Panel: FC<Props> = ({ ipfs }) => {
+export const Panel: FC = () => {
   const { enqueueSnackbar } = useSnackbar()
+  const ipfsPromise = useIpfs()
+  const peerNum = useContext(PeerNum)
+  const status = useContext(Status)
+  const id = useContext(Id)
   const fieldId = `file-${uuid()}`
-  const [id, setId] = useState<string>(``)
-  const [peers, setPeers] = useState<number>(0)
   const [files, setFiles] = useState<{ name: string; cid: string }[]>([])
-  const [content, setContent] = useState<string>(``)
+  const [fileContent, setFileContent] = useState<string>(``)
   const [file, setFile] = useState<File | null>(null)
   const [open, setOpen] = useState<boolean>(false)
-  const updateFiles = useCallback(async () => {
-    if (ipfs) {
+  const updateFileList = useCallback(() => {
+    ipfsPromise.then(async (ipfs: any) => {
       const result = []
       for await (const file of ipfs.files.ls(`/`))
         result.push({ name: file.name, cid: file.cid.toString() })
       setFiles(result)
-    }
-  }, [ipfs])
+    })
+  }, [ipfsPromise])
   useEffect(() => {
-    if (ipfs && ipfs.id) {
-      ipfs.id().then((id: any) => {
-        setId(id.id)
-        updateFiles()
-      })
-      const peersTimer = setInterval(async () => {
-        if (ipfs && ipfs.isOnline()) setPeers((await ipfs.swarm.peers()).length)
-      }, 1000)
-      return () => {
-        clearInterval(peersTimer)
-      }
+    const jobs: ReturnType<typeof setInterval>[] = []
+    switch (status) {
+      case `RUNNING`:
+        jobs.push(setInterval(updateFileList, 1000))
     }
-  }, [ipfs, updateFiles])
+    return () => jobs.forEach(job => clearInterval(job))
+  }, [status, updateFileList])
   const readFile = useCallback(
     async (addr: string) => {
+      const ipfs = await ipfsPromise
       if (ipfs && addr) {
         try {
           let result = ``
@@ -66,14 +58,14 @@ export const Panel: FC<Props> = ({ ipfs }) => {
             result = decoder.decode(file)
             break // Read only one file
           }
-          setContent(result)
+          setFileContent(result)
         } catch (e) {
-          setContent(e.message)
+          setFileContent(e.message)
         }
         setOpen(true)
       }
     },
-    [ipfs]
+    [ipfsPromise]
   )
   return (
     <>
@@ -92,7 +84,7 @@ export const Panel: FC<Props> = ({ ipfs }) => {
                   <TableCell component="th" scope="row">
                     Peers
                   </TableCell>
-                  <TableCell>{peers}</TableCell>
+                  <TableCell>{peerNum}</TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell component="th" scope="row">
@@ -104,10 +96,12 @@ export const Panel: FC<Props> = ({ ipfs }) => {
                       autoComplete="off"
                       onSubmit={event => {
                         event.preventDefault()
-                        if (ipfs && file)
-                          ipfs.files
-                            .write(`/${file.name}`, file, { create: true })
-                            .then(updateFiles)
+                        ipfsPromise.then((ipfs: any) => {
+                          if (ipfs && file)
+                            ipfs.files
+                              .write(`/${file.name}`, file, { create: true })
+                              .then(updateFileList)
+                        })
                       }}
                     >
                       <input
@@ -129,7 +123,7 @@ export const Panel: FC<Props> = ({ ipfs }) => {
                         </Button>
                       </label>
                       <Button type="submit" variant="contained">
-                        submit
+                        upload
                       </Button>
                     </form>
                   </TableCell>
@@ -150,15 +144,17 @@ export const Panel: FC<Props> = ({ ipfs }) => {
                     <Input
                       fields={[`topic`]}
                       submit="subscribe"
-                      onSubmit={async val => {
-                        if (ipfs) {
-                          await ipfs.pubsub.subscribe(val[0], (msg: any) => {
-                            enqueueSnackbar(
-                              `received message ${decoder.decode(msg.data)}`
-                            )
-                          })
-                          enqueueSnackbar(`subscribed to ${val}`)
-                        }
+                      onSubmit={val => {
+                        ipfsPromise.then(async (ipfs: any) => {
+                          if (ipfs) {
+                            await ipfs.pubsub.subscribe(val[0], (msg: any) => {
+                              enqueueSnackbar(
+                                `received message ${decoder.decode(msg.data)}`
+                              )
+                            })
+                            enqueueSnackbar(`subscribed to ${val}`)
+                          }
+                        })
                       }}
                     />
                   </TableCell>
@@ -171,16 +167,18 @@ export const Panel: FC<Props> = ({ ipfs }) => {
                     <Input
                       submit="publish"
                       fields={[`topic`, `message`]}
-                      onSubmit={async val => {
-                        if (ipfs) {
-                          await ipfs.pubsub.publish(
-                            val[0],
-                            encoder.encode(val[1])
-                          )
-                          enqueueSnackbar(
-                            `published ${val[1]} to topic ${val[0]}`
-                          )
-                        }
+                      onSubmit={val => {
+                        ipfsPromise.then(async (ipfs: any) => {
+                          if (ipfs) {
+                            await ipfs.pubsub.publish(
+                              val[0],
+                              encoder.encode(val[1])
+                            )
+                            enqueueSnackbar(
+                              `published ${val[1]} to topic ${val[0]}`
+                            )
+                          }
+                        })
                       }}
                     />
                   </TableCell>
@@ -210,7 +208,7 @@ export const Panel: FC<Props> = ({ ipfs }) => {
         </Grid>
       </Grid>
       <Dialog open={open} onClose={() => setOpen(false)}>
-        <DialogContent>{content}</DialogContent>
+        <DialogContent>{fileContent}</DialogContent>
       </Dialog>
     </>
   )

@@ -39,7 +39,7 @@ const SignalIcon: FC<{ number: number }> = ({ number }) => {
 }
 
 export const NavBar: FC = () => {
-  const [ipfs] = useIpfs()
+  const ipfsPromise = useIpfs()
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
   const [menuId] = useState(randStr())
   const [peerNum, setPeerNum] = useState(0)
@@ -94,7 +94,9 @@ export const NavBar: FC = () => {
         <MenuItem
           onClick={() => {
             closeMenu()
-            ipfs && !ipfs.isOnline() && ipfs.start()
+            ipfsPromise.then(
+              (ipfs: any) => ipfs && !ipfs.isOnline() && ipfs.start()
+            )
           }}
         >
           Start
@@ -102,7 +104,9 @@ export const NavBar: FC = () => {
         <MenuItem
           onClick={() => {
             closeMenu()
-            ipfs && ipfs.isOnline() && ipfs.stop()
+            ipfsPromise.then(
+              (ipfs: any) => ipfs && ipfs.isOnline() && ipfs.stop()
+            )
           }}
         >
           Stop

@@ -8,9 +8,7 @@ import React, {
 import { create as createIpfs } from 'ipfs'
 import createHttpClient from 'ipfs-http-client'
 
-type AsyncOrSync<T> = Promise<T> | T
-
-type Ipfs = AsyncOrSync<any> | null
+type Ipfs = Promise<any | null>
 
 type EmbeddedArgs = Parameters<typeof createIpfs>[0]
 type ExternalArgs = Parameters<typeof createHttpClient>[0]
@@ -20,15 +18,16 @@ const useIpfsInstance = (
     | { mode: 'embedded'; args: EmbeddedArgs }
     | { mode: 'external'; args: ExternalArgs }
 ): Ipfs => {
-  const [ipfs, setIpfs] = useState<Ipfs>(null)
+  const [ipfs, setIpfs] = useState<Ipfs>(Promise.resolve(null))
 
   useEffect(() => {
     function clear() {
-      setIpfs(null)
+      const newIpfsPromise = Promise.resolve(null)
+      setIpfs(newIpfsPromise)
     }
     switch (args.mode) {
       case `external`:
-        setIpfs(createHttpClient(args.args))
+        setIpfs(Promise.resolve(createHttpClient(args.args)))
         break
       case `embedded`:
         setIpfs(createIpfs(args.args))
@@ -43,7 +42,7 @@ const useIpfsInstance = (
   return ipfs
 }
 
-const Context = createContext<[Ipfs | null, Error | null]>([null, null])
+const Context = createContext<Ipfs>(Promise.resolve(null))
 
 export const IpfsProvider: FC<Parameters<typeof useIpfsInstance>[0]> = ({
   children,
