@@ -1,9 +1,7 @@
 import React, { ContextType, useEffect, useState } from 'react'
 import { makeStyles } from '@material-ui/core/styles'
 import { useIpfs } from '@onichandame/react-ipfs-hook'
-import { Grid } from '@material-ui/core'
 
-import { Panel, NavBar } from './components'
 import { PeerNum, Peers, Id, Status } from './context'
 
 const useStyles = makeStyles(theme => ({
@@ -44,13 +42,14 @@ function App() {
             ipfs.id().then(({ id }: { id: string }) => setId(id))
         })
         ipfsPromise.then((ipfs: any) => {
-          if (ipfs && ipfs.swarm && ipfs.swarm.peers)
+          if (ipfs && ipfs.swarm && ipfs.swarm.peers) {
             jobs.push(
               setInterval(() => {
                 ipfs.swarm.peers().then((prs: any[]) => setPeers(prs))
               }, 1000)
             )
-          ipfs.id().then(({ id }: { id: string }) => setId(id))
+            ipfs.id().then(({ id }: { id: string }) => setId(id))
+          }
         })
         break
       default:
@@ -67,17 +66,7 @@ function App() {
     <Peers.Provider value={peers}>
       <PeerNum.Provider value={peerNum}>
         <Id.Provider value={id}>
-          <div className={styles.root}>
-            <NavBar />
-            <Grid
-              container
-              spacing={0}
-              direction={'column'}
-              alignItems="center"
-            >
-              <Grid item>{status === 'RUNNING' ? <Panel /> : `loading`}</Grid>
-            </Grid>
-          </div>
+          <div className={styles.root}>hi</div>
         </Id.Provider>
       </PeerNum.Provider>
     </Peers.Provider>
