@@ -45,6 +45,6 @@
   },
   "dependencies": {
     "@testing-library/react": "^11.2.2",
-    "ipfs": "^0.50.2"
+    "ipfs-http-client": "^48.2.2"
   }
 }

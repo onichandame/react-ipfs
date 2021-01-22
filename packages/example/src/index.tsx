@@ -12,10 +12,7 @@ ReactDOM.render(
     <>
       <CssBaseline />
       <SnackbarProvider maxSnack={3}>
-        <IpfsProvider
-          mode="external"
-          args={{ host: `localhost`, port: 5001, protocol: `http` }}
-        >
+        <IpfsProvider host="localhost" port={5001} protocol="http">
           <App />
         </IpfsProvider>
       </SnackbarProvider>
