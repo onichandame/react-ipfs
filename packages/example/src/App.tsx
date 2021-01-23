@@ -3,6 +3,7 @@ import { makeStyles } from '@material-ui/core/styles'
 import { useIpfs } from '@onichandame/react-ipfs-hook'
 
 import { PeerNum, Peers, Id, Status } from './context'
+import { NavBar, Panel } from './components'
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -66,7 +67,10 @@ function App() {
     <Peers.Provider value={peers}>
       <PeerNum.Provider value={peerNum}>
         <Id.Provider value={id}>
-          <div className={styles.root}>hi</div>
+          <div className={styles.root}>
+            <NavBar />
+            {status === `RUNNING` && <Panel />}
+          </div>
         </Id.Provider>
       </PeerNum.Provider>
     </Peers.Provider>

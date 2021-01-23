@@ -1,4 +1,4 @@
-import React, { useEffect, useContext, MouseEvent, FC, useState } from 'react'
+import React, { useContext, MouseEvent, FC, useState } from 'react'
 import { v4 as randStr } from 'uuid'
 import {
   Group,
@@ -10,7 +10,9 @@ import {
   SignalCellularConnectedNoInternet0Bar,
 } from '@material-ui/icons'
 import {
+  Grid,
   Menu,
+  Divider,
   Badge,
   MenuItem,
   IconButton,
@@ -20,7 +22,7 @@ import {
 } from '@material-ui/core'
 import { useIpfs } from '@onichandame/react-ipfs-hook'
 
-import { Peers } from '../context'
+import { Peers, PeerNum } from '../context'
 
 const SignalIcon: FC<{ number: number }> = ({ number }) => {
   return number <= 0 ? (
@@ -40,21 +42,26 @@ const SignalIcon: FC<{ number: number }> = ({ number }) => {
 
 export const NavBar: FC = () => {
   const ipfsPromise = useIpfs()
-  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
+  const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null)
+  const [peersAnchor, setPeersAnchor] = useState<HTMLElement | null>(null)
   const [menuId] = useState(randStr())
-  const [peerNum, setPeerNum] = useState(0)
-
+  const [peersId] = useState(randStr())
+  const [showNum] = useState(10)
+  const peerNum = useContext(PeerNum)
   const peers = useContext(Peers)
 
-  useEffect(() => {
-    if (peers.length !== peerNum) setPeerNum(peers.length)
-  }, [peers, peerNum])
-
   const openMenu = (e: MouseEvent<HTMLElement>) => {
-    setAnchorEl(e.currentTarget)
+    setMenuAnchor(e.currentTarget)
   }
   const closeMenu = () => {
-    setAnchorEl(null)
+    setMenuAnchor(null)
+  }
+
+  const openPeers = (e: MouseEvent<HTMLElement>) => {
+    setPeersAnchor(e.currentTarget)
+  }
+  const closePeers = () => {
+    setPeersAnchor(null)
   }
 
   return (
@@ -65,13 +72,19 @@ export const NavBar: FC = () => {
             IPFS
           </Typography>
           <div style={{ flexGrow: 1 }} />
-          <IconButton>
+          <IconButton
+            color="inherit"
+            aria-label="ipfs peers"
+            aria-controls={peersId}
+            aria-haspopup="true"
+            onClick={openPeers}
+          >
             <Badge badgeContent={peerNum}>
               <Group />
             </Badge>
           </IconButton>
           <IconButton
-            edge="end"
+            color="inherit"
             aria-label="ipfs node"
             aria-controls={menuId}
             aria-haspopup="true"
@@ -82,35 +95,59 @@ export const NavBar: FC = () => {
         </Toolbar>
       </AppBar>
       <Menu
-        anchorEl={anchorEl}
+        anchorEl={menuAnchor}
         getContentAnchorEl={null}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
         id={menuId}
         keepMounted
-        open={!!anchorEl}
+        open={!!menuAnchor}
         onClose={closeMenu}
       >
         <MenuItem
           onClick={() => {
             closeMenu()
-            ipfsPromise.then(
-              (ipfs: any) => ipfs && !ipfs.isOnline() && ipfs.start()
-            )
-          }}
-        >
-          Start
-        </MenuItem>
-        <MenuItem
-          onClick={() => {
-            closeMenu()
-            ipfsPromise.then(
-              (ipfs: any) => ipfs && ipfs.isOnline() && ipfs.stop()
-            )
+            ipfsPromise.then(ipfs => ipfs && ipfs.stop())
           }}
         >
           Stop
         </MenuItem>
+      </Menu>
+      <Menu
+        anchorEl={peersAnchor}
+        getContentAnchorEl={null}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+        id={peersId}
+        keepMounted
+        open={!!peersAnchor}
+        onClose={closePeers}
+      >
+        <MenuItem onClick={closePeers}>
+          <Grid container direction="row" justify="space-between">
+            <Grid item></Grid>
+            <Grid item>total number: {peerNum}</Grid>
+          </Grid>
+        </MenuItem>
+        <Divider />
+        {peers.slice(0, showNum).map(peer => (
+          <MenuItem
+            key={randStr()}
+            onClick={() => {
+              closePeers()
+            }}
+          >
+            {peer.addr.toString()}
+          </MenuItem>
+        ))}
+        <Divider />
+        {peerNum > showNum && (
+          <MenuItem>
+            <Grid container direction="row" justify="space-around">
+              <Grid item>more</Grid>
+            </Grid>
+          </MenuItem>
+        )}
       </Menu>
     </div>
   )

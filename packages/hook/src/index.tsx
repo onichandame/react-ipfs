@@ -7,7 +7,7 @@ import React, {
 } from 'react'
 import createHttpClient from 'ipfs-http-client'
 
-type Ipfs = Promise<any | null>
+type Ipfs = Promise<ReturnType<typeof createHttpClient> | null>
 
 type ExternalArgs = Parameters<typeof createHttpClient>[0]
 
@@ -15,25 +15,21 @@ const useIpfsInstance = (args: ExternalArgs): Ipfs => {
   const [ipfs, setIpfs] = useState<Ipfs>(Promise.resolve(null))
 
   useEffect(() => {
-    function clear() {
-      const newIpfsPromise = Promise.resolve(null)
-      setIpfs(newIpfsPromise)
-    }
-    setIpfs(Promise.resolve(createHttpClient(args)))
+    const ipfs = createHttpClient(args)
+    setIpfs(Promise.resolve(ipfs))
 
-    return clear
-  }, [args, args])
+    return () => setIpfs(Promise.resolve(null))
+  }, [args])
 
   return ipfs
 }
 
 const Context = createContext<Ipfs>(Promise.resolve(null))
 
-export const IpfsProvider: FC<Parameters<typeof useIpfsInstance>[0]> = ({
-  children,
-  ...others
-}) => {
-  const ipfs = useIpfsInstance(others)
+export const IpfsProvider: FC<{
+  opts: Parameters<typeof useIpfsInstance>[0]
+}> = ({ children, opts }) => {
+  const ipfs = useIpfsInstance(opts)
   return <Context.Provider value={ipfs}>{children}</Context.Provider>
 }
 

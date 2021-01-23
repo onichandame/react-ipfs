@@ -1,6 +1,6 @@
 # react-ipfs-hook
 
-Start an embedded IPFS node for React apps.
+Connect to an external IPFS daemon. The embedded node is too limited to be usable so an external node is a must.
 
 # Author
 
@@ -14,23 +14,25 @@ For live example check <https://onichandame.com/react-ipfs-hook/>
 
 For detailed usage see [the example](./packages/example).
 
-```typescriptreact
+```typescript
 // App.tsx
-import {IpfsProvider} from '@onichandame/react-ipfs-hook'
-const App=()=>{
-  return <IpfsProvider><Child /></IpfsProvider>
+import { IpfsProvider } from '@onichandame/react-ipfs-hook'
+const App = () => {
+  return (
+    <IpfsProvider>
+      <Child />
+    </IpfsProvider>
+  )
 }
 
 // child.tsx
-import {useIpfs} from '@onichandame/react-ipfs-hook'
+import { useIpfs } from '@onichandame/react-ipfs-hook'
 const Child: FC = () => {
-  const { ipfs } = useIpfs()
+  const ipfsPromise = useIpfs()
   const [id, setId] = useState(``)
   useEffect(() => {
-    ipfs.id().then(id => setId(id))
-  }, [ipfs])
-  return (
-    <div>{id}</div>
-  )
+    ipfsPromise.then((ipfs) => ipfs.id().then((id) => setId(id.id)))
+  }, [ipfsPromise])
+  return <div>{id}</div>
 }
 ```
