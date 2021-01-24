@@ -17,13 +17,13 @@ jobs:
       - name: Set up dependency
         run: yarn install --frozen-lockfile
       - name: Build pages
-        run: yarn build
+        run: yarn build-storybook
       - name: Publish
         uses: JamesIves/github-pages-deploy-action@releases/v3
         with:
           ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH: gh-pages
-          FOLDER: packages/example/build
+          FOLDER: storybook-static
   publish:
     runs-on: ubuntu-latest
     steps:
@@ -36,7 +36,7 @@ jobs:
         env:
           NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }} # set this in github secrets
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # leave as it is. auto generated
-        with:
-          packages: '@onichandame/react-ipfs-hook'
-          mode: 'all'
-          tag_package: '@onichandame/react-ipfs-hook'
+        #with:
+        #  packages: '@onichandame/react-ipfs-hook'
+        #  mode: 'all'
+        #  tag_package: '@onichandame/react-ipfs-hook'
