@@ -1,6 +1,0 @@
-{
-  "watch": ["packages"],
-  "ignore": ["node_modules", "*.test.ts", "packages/example", "**/dist"],
-  "ext": "ts tsx",
-  "exec": "yarn build:hook && yarn example dev"
-}
