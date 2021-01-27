@@ -35,7 +35,7 @@
     "singleQuote": true,
     "trailingComma": "es5"
   },
-  "name": "react-ipfs-hook",
+  "name": "@onichandame/react-ipfs-hook",
   "author": "onichandame",
   "module": "dist/react-ipfs-hook.esm.js",
   "size-limit": [
