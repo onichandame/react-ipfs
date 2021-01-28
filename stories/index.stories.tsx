@@ -274,4 +274,10 @@ const Template: Story<Props> = args => <Root {...args} />
 // By passing using the Args format for exported stories, you can control the props for a component for reuse in a test
 // https://storybook.js.org/docs/react/workflows/unit-testing
 export const Example = Template.bind({})
-Example.args = { host: `localhost`, port: 5001, protocol: `http` }
+Example.args = {
+  host: `localhost`,
+  port: 5001,
+  protocol: `http`,
+  probeInterval: 5000,
+  livelinessProbe: true,
+}
