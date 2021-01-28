@@ -53,7 +53,7 @@ const Peers = createContext(
 const PeerNum = createContext(0)
 
 const Wrapper: FC = ({ children }) => {
-  const { status, ipfs, error } = useIpfs()
+  const { ipfs, error } = useIpfs()
   const [id, setId] = useState<ContextType<typeof Id>>(``)
   const [peers, setPeers] = useState<ContextType<typeof Peers>>([])
   const [peerNum, setPeerNum] = useState<ContextType<typeof PeerNum>>(0)
@@ -64,31 +64,22 @@ const Wrapper: FC = ({ children }) => {
       setPeers([])
     }
     let jobs: ReturnType<typeof setInterval>[] = []
-    switch (status) {
-      case `RUNNING`:
-        if (ipfs && ipfs.id)
-          ipfs.id().then(({ id }: { id: string }) => setId(id))
-        if (ipfs && ipfs.swarm && ipfs.swarm.peers) {
-          jobs.push(
-            setInterval(() => {
-              ipfs.swarm.peers().then((prs: any[]) => setPeers(prs))
-            }, 1000)
-          )
-        }
-        break
-      default:
-        reset()
+    if (ipfs && ipfs.id) ipfs.id().then(({ id }: { id: string }) => setId(id))
+    if (ipfs && ipfs.swarm && ipfs.swarm.peers) {
+      jobs.push(
+        setInterval(() => {
+          ipfs.swarm.peers().then((prs: any[]) => setPeers(prs))
+        }, 1000)
+      )
     }
+    if (!ipfs) reset()
     return () => jobs.forEach(job => clearInterval(job))
-  }, [status, ipfs])
+  }, [ipfs])
   // update derived info regularly
   useEffect(() => {
     const newPeerNum = peers.length
     if (newPeerNum !== peerNum) setPeerNum(newPeerNum)
   }, [peers, peerNum])
-  useEffect(() => {
-    console.log(status)
-  }, [status])
   return (
     <Id.Provider value={id}>
       <Peers.Provider value={peers}>
@@ -228,9 +219,17 @@ type Props = {
   host: string
   protocol: 'http' | 'https'
   port: number
+  livelinessProbe: true
+  probeInterval: 5000
 }
 
-const Root: FC<Props> = ({ host, protocol, port }) => {
+const Root: FC<Props> = ({
+  host,
+  protocol,
+  port,
+  probeInterval,
+  livelinessProbe,
+}) => {
   const useStyles = makeStyles(theme => ({
     root: {
       flexGrow: 1,
@@ -239,7 +238,11 @@ const Root: FC<Props> = ({ host, protocol, port }) => {
   }))
   const styles = useStyles()
   return (
-    <IpfsProvider opts={{ protocol, host, port }}>
+    <IpfsProvider
+      livelinessProbe={livelinessProbe}
+      probeInterval={probeInterval}
+      opts={{ protocol, host, port }}
+    >
       <Wrapper>
         <div className={styles.root}>
           <NavBar />
@@ -258,6 +261,8 @@ export default {
     },
     port: { control: { type: `number`, min: 1 } },
     protocol: { control: { type: `text` } },
+    probeInterval: { control: { type: `number` }, defaultValue: 5000 },
+    livelinessProbe: { control: { type: `boolean` }, defaultValue: true },
   },
   parameters: {
     controls: { expanded: true },

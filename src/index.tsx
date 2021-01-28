@@ -8,7 +8,6 @@ import React, {
 import createHttpClient from 'ipfs-http-client'
 
 type Ipfs = ReturnType<typeof createHttpClient> | null
-type Status = 'ERROR' | 'UNKNOWN' | 'RUNNING'
 
 type ExternalArgs = Parameters<typeof createHttpClient>[0]
 
@@ -27,16 +26,16 @@ const useIpfsPromise = (args: ExternalArgs): Promise<Ipfs> => {
   return ipfsPromise
 }
 
-const Context = createContext<{ ipfs: Ipfs; status: Status; error?: Error }>({
+const Context = createContext<{ ipfs: Ipfs; error?: Error }>({
   ipfs: null,
-  status: `UNKNOWN`,
 })
 
 export const IpfsProvider: FC<{
+  livelinessProbe?: boolean
+  probeInterval?: number
   opts: Parameters<typeof useIpfsPromise>[0]
-}> = ({ children, opts }) => {
+}> = ({ children, opts, livelinessProbe, probeInterval }) => {
   const ipfsPromise = useIpfsPromise(opts)
-  const [status, setStatus] = useState<Status>(`UNKNOWN`)
   const [ipfs, setIpfs] = useState<Ipfs>(null)
   const [error, setError] = useState<Error>()
   useEffect(() => {
@@ -44,25 +43,41 @@ export const IpfsProvider: FC<{
       .then(ipfs => {
         if (ipfs)
           return ipfs.id().then(() => {
-            if (status !== `RUNNING`) setStatus(`RUNNING`)
             setIpfs(ipfs)
             setError(undefined)
           })
         else {
+          setIpfs(null)
           setError(undefined)
-          return status !== `UNKNOWN` && setStatus(`UNKNOWN`)
         }
+        return
       })
       .catch(e => {
-        if (status !== `ERROR`) setStatus(`ERROR`)
+        setIpfs(null)
         setError(e)
       })
-  }, [ipfsPromise, status])
-  return (
-    <Context.Provider value={{ ipfs, status, error }}>
-      {children}
-    </Context.Provider>
-  )
+  }, [ipfsPromise])
+  useEffect(() => {
+    const jobs: ReturnType<typeof setInterval>[] = []
+    if (livelinessProbe) {
+      jobs.push(
+        setInterval(
+          () =>
+            ipfs
+              ?.id()
+              .then(() => {
+                if (error) setError(undefined)
+              })
+              .catch(e => {
+                setError(e)
+              }),
+          probeInterval || 5000
+        )
+      )
+    }
+    return () => jobs.forEach(job => clearInterval(job))
+  }, [ipfs, error])
+  return <Context.Provider value={{ ipfs, error }}>{children}</Context.Provider>
 }
 
 export const useIpfs = () => {
