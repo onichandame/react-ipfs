@@ -7,30 +7,62 @@ import React, {
 } from 'react'
 import createHttpClient from 'ipfs-http-client'
 
-type Ipfs = Promise<ReturnType<typeof createHttpClient> | null>
+type Ipfs = ReturnType<typeof createHttpClient> | null
+type Status = 'ERROR' | 'UNKNOWN' | 'RUNNING'
 
 type ExternalArgs = Parameters<typeof createHttpClient>[0]
 
-const useIpfsInstance = (args: ExternalArgs): Ipfs => {
-  const [ipfs, setIpfs] = useState<Ipfs>(Promise.resolve(null))
+const useIpfsPromise = (args: ExternalArgs): Promise<Ipfs> => {
+  const [ipfsPromise, setIpfsPromise] = useState<Promise<Ipfs>>(
+    Promise.resolve(null)
+  )
 
   useEffect(() => {
     const ipfs = createHttpClient(args)
-    setIpfs(Promise.resolve(ipfs))
+    setIpfsPromise(Promise.resolve(ipfs))
 
-    return () => setIpfs(Promise.resolve(null))
+    return () => setIpfsPromise(Promise.resolve(null))
   }, [args])
 
-  return ipfs
+  return ipfsPromise
 }
 
-const Context = createContext<Ipfs>(Promise.resolve(null))
+const Context = createContext<{ ipfs: Ipfs; status: Status; error?: Error }>({
+  ipfs: null,
+  status: `UNKNOWN`,
+})
 
 export const IpfsProvider: FC<{
-  opts: Parameters<typeof useIpfsInstance>[0]
+  opts: Parameters<typeof useIpfsPromise>[0]
 }> = ({ children, opts }) => {
-  const ipfs = useIpfsInstance(opts)
-  return <Context.Provider value={ipfs}>{children}</Context.Provider>
+  const ipfsPromise = useIpfsPromise(opts)
+  const [status, setStatus] = useState<Status>(`UNKNOWN`)
+  const [ipfs, setIpfs] = useState<Ipfs>(null)
+  const [error, setError] = useState<Error>()
+  useEffect(() => {
+    ipfsPromise
+      .then(ipfs => {
+        if (ipfs)
+          return ipfs.id().then(() => {
+            if (status !== `RUNNING`) setStatus(`RUNNING`)
+            setIpfs(ipfs)
+            setError(undefined)
+          })
+        else {
+          setError(undefined)
+          return status !== `UNKNOWN` && setStatus(`UNKNOWN`)
+        }
+      })
+      .catch(e => {
+        if (status !== `ERROR`) setStatus(`ERROR`)
+        setError(e)
+      })
+  }, [ipfsPromise, status])
+  return (
+    <Context.Provider value={{ ipfs, status, error }}>
+      {children}
+    </Context.Provider>
+  )
 }
 
 export const useIpfs = () => {

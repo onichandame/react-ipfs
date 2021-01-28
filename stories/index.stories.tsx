@@ -1,6 +1,5 @@
 import { makeStyles } from '@material-ui/core/styles'
 import React, {
-  useCallback,
   MouseEvent,
   useContext,
   createContext,
@@ -38,7 +37,6 @@ const randStr = () =>
     .toString(36)
     .substr(2, 5)
 
-const Status = createContext(`UNKNOWN` as 'UNKNOWN' | 'RUNNING' | 'ERROR')
 const Id = createContext(``)
 const Peers = createContext(
   [] as {
@@ -55,26 +53,10 @@ const Peers = createContext(
 const PeerNum = createContext(0)
 
 const Wrapper: FC = ({ children }) => {
-  const ipfsPromise = useIpfs()
+  const { status, ipfs, error } = useIpfs()
   const [id, setId] = useState<ContextType<typeof Id>>(``)
-  const [status, setStatus] = useState<ContextType<typeof Status>>(`UNKNOWN`)
   const [peers, setPeers] = useState<ContextType<typeof Peers>>([])
   const [peerNum, setPeerNum] = useState<ContextType<typeof PeerNum>>(0)
-  const checkStatus = useCallback(
-    (err?: Error) => {
-      ipfsPromise
-        .then(ipfs => ipfs.id())
-        .then(() => status !== `RUNNING` && setStatus(`RUNNING`))
-        .catch((e: Error) => {
-          status !== `ERROR` && setStatus(`ERROR`)
-          throw err || e
-        })
-    },
-    [ipfsPromise, status]
-  )
-  useEffect(() => {
-    checkStatus()
-  }, [checkStatus])
   // update basic info regularly
   useEffect(() => {
     const reset = () => {
@@ -84,25 +66,21 @@ const Wrapper: FC = ({ children }) => {
     let jobs: ReturnType<typeof setInterval>[] = []
     switch (status) {
       case `RUNNING`:
-        ipfsPromise
-          .then(ipfs => {
-            if (ipfs && ipfs.id)
-              ipfs.id().then(({ id }: { id: string }) => setId(id))
-            if (ipfs && ipfs.swarm && ipfs.swarm.peers) {
-              jobs.push(
-                setInterval(() => {
-                  ipfs.swarm.peers().then((prs: any[]) => setPeers(prs))
-                }, 1000)
-              )
-            }
-          })
-          .catch(e => checkStatus(e))
+        if (ipfs && ipfs.id)
+          ipfs.id().then(({ id }: { id: string }) => setId(id))
+        if (ipfs && ipfs.swarm && ipfs.swarm.peers) {
+          jobs.push(
+            setInterval(() => {
+              ipfs.swarm.peers().then((prs: any[]) => setPeers(prs))
+            }, 1000)
+          )
+        }
         break
       default:
         reset()
     }
     return () => jobs.forEach(job => clearInterval(job))
-  }, [status, ipfsPromise, checkStatus])
+  }, [status, ipfs])
   // update derived info regularly
   useEffect(() => {
     const newPeerNum = peers.length
@@ -113,17 +91,17 @@ const Wrapper: FC = ({ children }) => {
   }, [status])
   return (
     <Id.Provider value={id}>
-      <Status.Provider value={status}>
-        <Peers.Provider value={peers}>
-          <PeerNum.Provider value={peerNum}>{children}</PeerNum.Provider>
-        </Peers.Provider>
-      </Status.Provider>
+      <Peers.Provider value={peers}>
+        <PeerNum.Provider value={peerNum}>
+          {error ? JSON.stringify(error.stack) : children}
+        </PeerNum.Provider>
+      </Peers.Provider>
     </Id.Provider>
   )
 }
 
 const NavBar: FC = () => {
-  const ipfsPromise = useIpfs()
+  const { ipfs } = useIpfs()
   const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null)
   const [peersAnchor, setPeersAnchor] = useState<HTMLElement | null>(null)
   const [menuId] = useState(randStr())
@@ -201,7 +179,7 @@ const NavBar: FC = () => {
         <MenuItem
           onClick={() => {
             closeMenu()
-            ipfsPromise.then(ipfs => ipfs && ipfs.stop())
+            ipfs.stop()
           }}
         >
           Stop
