@@ -1,4 +1,5 @@
 import { makeStyles } from '@material-ui/core/styles'
+import { SnackbarProvider, useSnackbar } from 'notistack'
 import React, {
   MouseEvent,
   useContext,
@@ -9,6 +10,10 @@ import React, {
   ContextType,
 } from 'react'
 import {
+  Dialog,
+  DialogTitle,
+  List,
+  ListItem,
   Divider,
   Grid,
   Menu,
@@ -84,10 +89,34 @@ const Wrapper: FC = ({ children }) => {
     <Id.Provider value={id}>
       <Peers.Provider value={peers}>
         <PeerNum.Provider value={peerNum}>
-          {error ? JSON.stringify(error.stack) : children}
+          <SnackbarProvider maxSnack={2}>
+            {error ? JSON.stringify(error.stack) : children}
+          </SnackbarProvider>
         </PeerNum.Provider>
       </Peers.Provider>
     </Id.Provider>
+  )
+}
+
+const PeersList: FC = () => {
+  const peers = useContext(Peers)
+  const { enqueueSnackbar } = useSnackbar()
+  return (
+    <List>
+      {peers.map(peer => (
+        <ListItem
+          onClick={e => {
+            e.preventDefault()
+            navigator.clipboard.writeText(peer.peer)
+            enqueueSnackbar(`peer id copied!`, { variant: `success` })
+          }}
+          button
+          key={randStr()}
+        >
+          {peer.peer}
+        </ListItem>
+      ))}
+    </List>
   )
 }
 
@@ -98,8 +127,11 @@ const NavBar: FC = () => {
   const [menuId] = useState(randStr())
   const [peersId] = useState(randStr())
   const [showNum] = useState(10)
+  const [peerListOpen, setPeerListOpen] = useState(false)
   const peerNum = useContext(PeerNum)
   const peers = useContext(Peers)
+  const id = useContext(Id)
+  const { enqueueSnackbar } = useSnackbar()
 
   const openMenu = (e: MouseEvent<HTMLElement>) => {
     setMenuAnchor(e.currentTarget)
@@ -168,6 +200,16 @@ const NavBar: FC = () => {
         onClose={closeMenu}
       >
         <MenuItem
+          onClick={e => {
+            e.preventDefault()
+            closeMenu()
+            navigator.clipboard.writeText(id)
+            enqueueSnackbar(`id clipped to clipboard!`, { variant: `success` })
+          }}
+        >
+          my id: {id}
+        </MenuItem>
+        <MenuItem
           onClick={() => {
             closeMenu()
             ipfs.stop()
@@ -204,13 +246,23 @@ const NavBar: FC = () => {
         ))}
         <Divider />
         {peerNum > showNum && (
-          <MenuItem>
+          <MenuItem
+            onClick={e => {
+              e.preventDefault()
+              closePeers()
+              setPeerListOpen(true)
+            }}
+          >
             <Grid container direction="row" justify="space-around">
               <Grid item>more</Grid>
             </Grid>
           </MenuItem>
         )}
       </Menu>
+      <Dialog open={peerListOpen} onClose={() => setPeerListOpen(false)}>
+        <DialogTitle>Peers</DialogTitle>
+        <PeersList />
+      </Dialog>
     </div>
   )
 }
