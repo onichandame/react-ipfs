@@ -7,28 +7,31 @@ import React, {
 } from 'react'
 import createHttpClient from 'ipfs-http-client'
 
-type Ipfs = ReturnType<typeof createHttpClient> | null
+import { Nullable } from './types'
+
+type Ipfs = ReturnType<typeof createHttpClient>
 
 type ExternalArgs = Parameters<typeof createHttpClient>[0]
 
-const useIpfsPromise = (args: ExternalArgs): Promise<Ipfs> => {
-  const [ipfsPromise, setIpfsPromise] = useState<Promise<Ipfs>>(
-    Promise.resolve(null)
-  )
+const useIpfsPromise = (args: ExternalArgs): Nullable<Promise<Ipfs>> => {
+  const [ipfsPromise, setIpfsPromise] = useState<Nullable<Promise<Ipfs>>>(null)
 
   useEffect(() => {
     const ipfs = createHttpClient(args)
     setIpfsPromise(Promise.resolve(ipfs))
 
-    return () => setIpfsPromise(Promise.resolve(null))
+    return () => setIpfsPromise(null)
   }, [args])
 
   return ipfsPromise
 }
 
-const Context = createContext<{ ipfs: Ipfs; error?: Error }>({
-  ipfs: null,
-})
+const Context = createContext<{ ipfs: Nullable<Ipfs>; error: Nullable<Error> }>(
+  {
+    ipfs: null,
+    error: null,
+  }
+)
 
 export const IpfsProvider: FC<{
   livelinessProbe?: boolean
@@ -36,11 +39,11 @@ export const IpfsProvider: FC<{
   opts: Parameters<typeof useIpfsPromise>[0]
 }> = ({ children, opts, livelinessProbe, probeInterval }) => {
   const ipfsPromise = useIpfsPromise(opts)
-  const [ipfs, setIpfs] = useState<Ipfs>(null)
-  const [error, setError] = useState<Error>()
+  const [ipfs, setIpfs] = useState<Nullable<Ipfs>>(null)
+  const [error, setError] = useState<Nullable<Error>>(null)
   useEffect(() => {
     ipfsPromise
-      .then(ipfs => {
+      ?.then(ipfs => {
         if (ipfs)
           return ipfs.id().then(() => {
             setIpfs(ipfs)
