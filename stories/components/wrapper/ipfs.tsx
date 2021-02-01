@@ -10,7 +10,7 @@ import { useIpfs, IpfsProvider } from '../../../src'
 import { Id, Peers, PeerNum } from '../../contexts'
 
 const IpfsInfoWrapper: FC = ({ children }) => {
-  const { ipfs, error } = useIpfs()
+  const { ipfs } = useIpfs()
   const [id, setId] = useState<ContextType<typeof Id>>(``)
   const [peers, setPeers] = useState<ContextType<typeof Peers>>([])
   const [peerNum, setPeerNum] = useState<ContextType<typeof PeerNum>>(0)
@@ -40,9 +40,7 @@ const IpfsInfoWrapper: FC = ({ children }) => {
   return (
     <Id.Provider value={id}>
       <Peers.Provider value={peers}>
-        <PeerNum.Provider value={peerNum}>
-          {error ? JSON.stringify(error.stack) : children}
-        </PeerNum.Provider>
+        <PeerNum.Provider value={peerNum}>{children}</PeerNum.Provider>
       </Peers.Provider>
     </Id.Provider>
   )

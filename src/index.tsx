@@ -42,23 +42,18 @@ export const IpfsProvider: FC<{
   const [ipfs, setIpfs] = useState<Nullable<Ipfs>>(null)
   const [error, setError] = useState<Nullable<Error>>(null)
   useEffect(() => {
-    ipfsPromise
-      ?.then(ipfs => {
-        if (ipfs)
-          return ipfs.id().then(() => {
-            setIpfs(ipfs)
-            setError(undefined)
-          })
-        else {
-          setIpfs(null)
-          setError(undefined)
-        }
-        return
-      })
-      .catch(e => {
-        setIpfs(null)
-        setError(e)
-      })
+    let isNew = true
+    ipfsPromise?.then(ipfs => {
+      if (ipfs && isNew) setIpfs(ipfs)
+      setError(undefined)
+    })
+    ipfsPromise?.catch(e => {
+      setIpfs(null)
+      setError(e)
+    })
+    return () => {
+      isNew = false
+    }
   }, [ipfsPromise])
   useEffect(() => {
     const jobs: ReturnType<typeof setInterval>[] = []
