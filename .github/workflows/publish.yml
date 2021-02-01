@@ -14,7 +14,7 @@ jobs:
       - name: Build distributions
         run: yarn
       - name: Publish to NPM
-        uses: onichandame/github-action-npm-publish@v0.1.4
+        uses: onichandame/github-action-npm-publish@v0.1.5
         env:
           NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }} # set this in github secrets
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # leave as it is. auto generated
