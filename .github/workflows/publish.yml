@@ -1,30 +1,12 @@
-name: deploy
+name: npm
 on:
   push:
     branches:
       - master
+      - main
 jobs:
-  ghpage-publish:
-    name: ghpage-publish
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@master
-      - name: Set up Node.js
-        uses: actions/setup-node@master
-        with:
-          node-version: 12.x
-      - name: Set up dependency
-        run: yarn install --frozen-lockfile
-      - name: Build pages
-        run: yarn build-storybook
-      - name: Publish
-        uses: JamesIves/github-pages-deploy-action@releases/v3
-        with:
-          ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BRANCH: gh-pages
-          FOLDER: storybook-static
   publish:
+    name: 'Publish to NPM registry'
     runs-on: ubuntu-latest
     steps:
       - name: Prepare repo
