@@ -24,11 +24,6 @@
   "peerDependencies": {
     "react": ">=16"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "tsdx lint"
-    }
-  },
   "prettier": {
     "printWidth": 80,
     "semi": false,
@@ -72,6 +67,7 @@
   "dependencies": {
     "@material-ui/core": "^4.11.2",
     "@material-ui/icons": "^4.11.2",
-    "ipfs-http-client": "^48.2.2"
+    "ipfs": "^0.58.3",
+    "ipfs-http-client": "^52.0.3"
   }
 }

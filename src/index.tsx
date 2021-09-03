@@ -43,11 +43,11 @@ export const IpfsProvider: FC<{
   const [error, setError] = useState<Nullable<Error>>(null)
   useEffect(() => {
     let isNew = true
-    ipfsPromise?.then(ipfs => {
+    ipfsPromise?.then((ipfs) => {
       if (ipfs && isNew) setIpfs(ipfs)
       setError(undefined)
     })
-    ipfsPromise?.catch(e => {
+    ipfsPromise?.catch((e) => {
       setIpfs(null)
       setError(e)
     })
@@ -66,14 +66,14 @@ export const IpfsProvider: FC<{
               .then(() => {
                 if (error) setError(undefined)
               })
-              .catch(e => {
+              .catch((e) => {
                 setError(e)
               }),
           probeInterval || 5000
         )
       )
     }
-    return () => jobs.forEach(job => clearInterval(job))
+    return () => jobs.forEach((job) => clearInterval(job))
   }, [ipfs, error])
   return <Context.Provider value={{ ipfs, error }}>{children}</Context.Provider>
 }
