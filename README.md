@@ -16,7 +16,7 @@ The designed use case is to wrap the entire app with a context provider providin
 
 To install: `yarn add @onichandame/react-ipfs-hook`
 
-For example usage see [the storybook](https://onichandame.com/react-ipfs-hook), or the [source](./stories/index.stories.tsx).
+For example usage see [the storybook](https://onichandame.github.io/react-ipfs/), or the [source](./stories/index.stories.tsx).
 
 ```typescript
 // App.tsx
